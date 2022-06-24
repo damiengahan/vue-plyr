@@ -8505,7 +8505,7 @@ var browser = {
   isEdge: window.navigator.userAgent.includes("Edge"),
   isWebkit: "WebkitAppearance" in document.documentElement.style && !/Edge/.test(navigator.userAgent),
   isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
-  isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
+  isIos: "MacIntel" === navigator.platform && navigator.maxTouchPoints > 1 || /(iPad|iPhone|iPod)/gi.test(navigator.platform)
 };
 
 function cloneDeep(e) {
@@ -8843,6 +8843,10 @@ function closest(e, t) {
   }) : null;
 }
 
+function supportsCSS(e) {
+  return !(!window || !window.CSS) && window.CSS.supports(e);
+}
+
 var standardRatios = [[1, 1], [4, 3], [3, 4], [5, 4], [4, 5], [3, 2], [2, 3], [16, 10], [10, 16], [16, 9], [9, 16], [21, 9], [9, 21], [32, 9], [9, 32]].reduce(function (e, _ref5) {
   var _ref6 = _slicedToArray(_ref5, 2),
       t = _ref6[0],
@@ -8883,10 +8887,10 @@ function getAspectRatio(e) {
     var _this$media = this.media,
         _e2 = _this$media.videoWidth,
         _t = _this$media.videoHeight;
-    i = reduceAspectRatio([_e2, _t]);
+    i = [_e2, _t];
   }
 
-  return i;
+  return reduceAspectRatio(i);
 }
 
 function setAspectRatio(e) {
@@ -8895,17 +8899,18 @@ function setAspectRatio(e) {
       i = getAspectRatio.call(this, e);
   if (!is.array(i)) return {};
 
-  var _i = _slicedToArray(i, 2),
-      s = _i[0],
-      n = _i[1],
+  var _reduceAspectRatio = reduceAspectRatio(i),
+      _reduceAspectRatio2 = _slicedToArray(_reduceAspectRatio, 2),
+      s = _reduceAspectRatio2[0],
+      n = _reduceAspectRatio2[1],
       r = 100 / s * n;
 
-  if (!!window.CSS && window.CSS.supports("aspect-ratio: ".concat(s, "/").concat(n)) ? t.style.aspectRatio = "".concat(s, "/").concat(n) : t.style.paddingBottom = "".concat(r, "%"), this.isVimeo && !this.config.vimeo.premium && this.supported.ui) {
+  if (supportsCSS("aspect-ratio: ".concat(s, "/").concat(n)) ? t.style.aspectRatio = "".concat(s, "/").concat(n) : t.style.paddingBottom = "".concat(r, "%"), this.isVimeo && !this.config.vimeo.premium && this.supported.ui) {
     var _e3 = 100 / this.media.offsetWidth * parseInt(window.getComputedStyle(this.media).paddingBottom, 10),
-        _i2 = (_e3 - r) / (_e3 / 50);
+        _i = (_e3 - r) / (_e3 / 50);
 
-    this.fullscreen.active ? t.style.paddingBottom = null : this.media.style.transform = "translateY(-".concat(_i2, "%)");
-  } else this.isHTML5 && t.classList.toggle(this.config.classNames.videoFixedRatio, null !== i);
+    this.fullscreen.active ? t.style.paddingBottom = null : this.media.style.transform = "translateY(-".concat(_i, "%)");
+  } else this.isHTML5 && t.classList.add(this.config.classNames.videoFixedRatio);
 
   return {
     padding: r,
@@ -8918,6 +8923,10 @@ function roundAspectRatio(e, t) {
   var s = e / t,
       n = closest(Object.keys(standardRatios), s);
   return Math.abs(n - s) <= i ? standardRatios[n] : [e, t];
+}
+
+function getViewportSize() {
+  return [Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0), Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)];
 }
 
 var html5 = {
@@ -9001,7 +9010,7 @@ var replaceAll = function replaceAll() {
     toTitleCase = function toTitleCase() {
   var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
   return e.toString().replace(/\w\S*/g, function (e) {
-    return e.charAt(0).toUpperCase() + e.substr(1).toLowerCase();
+    return e.charAt(0).toUpperCase() + e.slice(1).toLowerCase();
   });
 };
 
@@ -9074,7 +9083,11 @@ var Storage = /*#__PURE__*/function () {
 
       var t = _this5.get();
 
-      is.empty(t) && (t = {}), extend(t, e), window.localStorage.setItem(_this5.key, JSON.stringify(t));
+      is.empty(t) && (t = {}), extend(t, e);
+
+      try {
+        window.localStorage.setItem(_this5.key, JSON.stringify(t));
+      } catch (e) {}
     }), this.enabled = e.config.storage.enabled, this.key = e.config.storage.key;
   }
 
@@ -9143,9 +9156,14 @@ function _loadSprite(e, t) {
     }
 
     fetch(e).then(function (e) {
-      is.empty(e) || (_n && window.localStorage.setItem("cache-".concat(t), JSON.stringify({
-        content: e
-      })), r(a, e));
+      if (!is.empty(e)) {
+        if (_n) try {
+          window.localStorage.setItem("cache-".concat(t), JSON.stringify({
+            content: e
+          }));
+        } catch (e) {}
+        r(a, e);
+      }
     }).catch(function () {});
   }
 }
@@ -9176,10 +9194,12 @@ function _formatTime() {
 
 var controls = {
   getIconUrl: function getIconUrl() {
-    var e = new URL(this.config.iconUrl, window.location).host !== window.location.host || browser.isIE && !window.svg4everybody;
+    var e = new URL(this.config.iconUrl, window.location),
+        t = window.location.host ? window.location.host : window.top.location.host,
+        i = e.host !== t || browser.isIE && !window.svg4everybody;
     return {
       url: this.config.iconUrl,
-      cors: e
+      cors: i
     };
   },
   findElements: function findElements() {
@@ -9342,16 +9362,16 @@ var controls = {
     var _this7 = this;
 
     on.call(this, e, "keydown keyup", function (i) {
-      if (![32, 38, 39, 40].includes(i.which)) return;
+      if (!["Space", "ArrowUp", "ArrowDown", "ArrowRight"].includes(i.key)) return;
       if (i.preventDefault(), i.stopPropagation(), "keydown" === i.type) return;
       var s = matches(e, '[role="menuitemradio"]');
-      if (!s && [32, 39].includes(i.which)) controls.showMenuPanel.call(_this7, t, !0);else {
+      if (!s && ["Space", "ArrowRight"].includes(i.key)) controls.showMenuPanel.call(_this7, t, !0);else {
         var _t4;
 
-        32 !== i.which && (40 === i.which || s && 39 === i.which ? (_t4 = e.nextElementSibling, is.element(_t4) || (_t4 = e.parentNode.firstElementChild)) : (_t4 = e.previousElementSibling, is.element(_t4) || (_t4 = e.parentNode.lastElementChild)), setFocus.call(_this7, _t4, !0));
+        "Space" !== i.key && ("ArrowDown" === i.key || s && "ArrowRight" === i.key ? (_t4 = e.nextElementSibling, is.element(_t4) || (_t4 = e.parentNode.firstElementChild)) : (_t4 = e.previousElementSibling, is.element(_t4) || (_t4 = e.parentNode.lastElementChild)), setFocus.call(_this7, _t4, !0));
       }
     }, !1), on.call(this, e, "keyup", function (e) {
-      13 === e.which && controls.focusFirstMenuItem.call(_this7, null, !0);
+      "Return" === e.key && controls.focusFirstMenuItem.call(_this7, null, !0);
     });
   },
   createMenuItem: function createMenuItem(_ref9) {
@@ -9387,7 +9407,7 @@ var controls = {
         }), o.setAttribute("aria-checked", e ? "true" : "false");
       }
     }), this.listeners.bind(o, "click keyup", function (t) {
-      if (!is.keyboardEvent(t) || 32 === t.which) {
+      if (!is.keyboardEvent(t) || "Space" === t.key) {
         switch (t.preventDefault(), t.stopPropagation(), o.checked = !0, i) {
           case "language":
             _this8.currentTrack = Number(e);
@@ -9475,23 +9495,30 @@ var controls = {
     }
   },
   updateSeekTooltip: function updateSeekTooltip(e) {
-    var _this10 = this;
-
+    var t, i;
     if (!this.config.tooltips.seek || !is.element(this.elements.inputs.seek) || !is.element(this.elements.display.seekTooltip) || 0 === this.duration) return;
 
-    var t = "".concat(this.config.classNames.tooltip, "--visible"),
-        i = function i(e) {
-      return toggleClass(_this10.elements.display.seekTooltip, t, e);
+    var s = this.elements.display.seekTooltip,
+        n = "".concat(this.config.classNames.tooltip, "--visible"),
+        r = function r(e) {
+      return toggleClass(s, n, e);
     };
 
-    if (this.touch) return void i(!1);
-    var s = 0;
-    var n = this.elements.progress.getBoundingClientRect();
-    if (is.event(e)) s = 100 / n.width * (e.pageX - n.left);else {
-      if (!hasClass(this.elements.display.seekTooltip, t)) return;
-      s = parseFloat(this.elements.display.seekTooltip.style.left, 10);
+    if (this.touch) return void r(!1);
+    var a = 0;
+    var o = this.elements.progress.getBoundingClientRect();
+    if (is.event(e)) a = 100 / o.width * (e.pageX - o.left);else {
+      if (!hasClass(s, n)) return;
+      a = parseFloat(s.style.left, 10);
     }
-    s < 0 ? s = 0 : s > 100 && (s = 100), controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, this.duration / 100 * s), this.elements.display.seekTooltip.style.left = "".concat(s, "%"), is.event(e) && ["mouseenter", "mouseleave"].includes(e.type) && i("mouseenter" === e.type);
+    a < 0 ? a = 0 : a > 100 && (a = 100);
+    var l = this.duration / 100 * a;
+    s.innerText = controls.formatTime(l);
+    var c = null === (t = this.config.markers) || void 0 === t || null === (i = t.points) || void 0 === i ? void 0 : i.find(function (_ref10) {
+      var e = _ref10.time;
+      return e === Math.round(l);
+    });
+    c && s.insertAdjacentHTML("afterbegin", "".concat(c.label, "<br>")), s.style.left = "".concat(a, "%"), is.event(e) && ["mouseenter", "mouseleave"].includes(e.type) && r("mouseenter" === e.type);
   },
   timeUpdate: function timeUpdate(e) {
     var t = !is.element(this.elements.display.duration) && this.config.invertTime;
@@ -9502,7 +9529,7 @@ var controls = {
     if (this.duration >= Math.pow(2, 32)) return toggleHidden(this.elements.display.currentTime, !0), void toggleHidden(this.elements.progress, !0);
     is.element(this.elements.inputs.seek) && this.elements.inputs.seek.setAttribute("aria-valuemax", this.duration);
     var e = is.element(this.elements.display.duration);
-    !e && this.config.displayDuration && this.paused && controls.updateTimeDisplay.call(this, this.elements.display.currentTime, this.duration), e && controls.updateTimeDisplay.call(this, this.elements.display.duration, this.duration), controls.updateSeekTooltip.call(this);
+    !e && this.config.displayDuration && this.paused && controls.updateTimeDisplay.call(this, this.elements.display.currentTime, this.duration), e && controls.updateTimeDisplay.call(this, this.elements.display.duration, this.duration), this.config.markers.enabled && controls.setMarkers.call(this), controls.updateSeekTooltip.call(this);
   },
   toggleMenuButton: function toggleMenuButton(e, t) {
     toggleHidden(this.elements.settings.buttons[e], !t);
@@ -9542,37 +9569,37 @@ var controls = {
     }
   },
   setQualityMenu: function setQualityMenu(e) {
-    var _this11 = this;
+    var _this10 = this;
 
     if (!is.element(this.elements.settings.panels.quality)) return;
     var t = "quality",
         i = this.elements.settings.panels.quality.querySelector('[role="menu"]');
     is.array(e) && (this.options.quality = dedupe(e).filter(function (e) {
-      return _this11.config.quality.options.includes(e);
+      return _this10.config.quality.options.includes(e);
     }));
     var s = !is.empty(this.options.quality) && this.options.quality.length > 1;
     if (controls.toggleMenuButton.call(this, t, s), emptyElement(i), controls.checkMenu.call(this), !s) return;
 
     var n = function n(e) {
-      var t = i18n.get("qualityBadge.".concat(e), _this11.config);
-      return t.length ? controls.createBadge.call(_this11, t) : null;
+      var t = i18n.get("qualityBadge.".concat(e), _this10.config);
+      return t.length ? controls.createBadge.call(_this10, t) : null;
     };
 
     this.options.quality.sort(function (e, t) {
-      var i = _this11.config.quality.options;
+      var i = _this10.config.quality.options;
       return i.indexOf(e) > i.indexOf(t) ? 1 : -1;
     }).forEach(function (e) {
-      controls.createMenuItem.call(_this11, {
+      controls.createMenuItem.call(_this10, {
         value: e,
         list: i,
         type: t,
-        title: controls.getLabel.call(_this11, "quality", e),
+        title: controls.getLabel.call(_this10, "quality", e),
         badge: n(e)
       });
     }), controls.updateSetting.call(this, t, i);
   },
   setCaptionsMenu: function setCaptionsMenu() {
-    var _this12 = this;
+    var _this11 = this;
 
     if (!is.element(this.elements.settings.panels.captions)) return;
     var e = "captions",
@@ -9583,9 +9610,9 @@ var controls = {
     var n = i.map(function (e, i) {
       return {
         value: i,
-        checked: _this12.captions.toggled && _this12.currentTrack === i,
-        title: captions.getLabel.call(_this12, e),
-        badge: e.language && controls.createBadge.call(_this12, e.language.toUpperCase()),
+        checked: _this11.captions.toggled && _this11.currentTrack === i,
+        title: captions.getLabel.call(_this11, e),
+        badge: e.language && controls.createBadge.call(_this11, e.language.toUpperCase()),
         list: t,
         type: "language"
       };
@@ -9599,21 +9626,21 @@ var controls = {
     }), n.forEach(controls.createMenuItem.bind(this)), controls.updateSetting.call(this, e, t);
   },
   setSpeedMenu: function setSpeedMenu() {
-    var _this13 = this;
+    var _this12 = this;
 
     if (!is.element(this.elements.settings.panels.speed)) return;
     var e = "speed",
         t = this.elements.settings.panels.speed.querySelector('[role="menu"]');
     this.options.speed = this.options.speed.filter(function (e) {
-      return e >= _this13.minimumSpeed && e <= _this13.maximumSpeed;
+      return e >= _this12.minimumSpeed && e <= _this12.maximumSpeed;
     });
     var i = !is.empty(this.options.speed) && this.options.speed.length > 1;
     controls.toggleMenuButton.call(this, e, i), emptyElement(t), controls.checkMenu.call(this), i && (this.options.speed.forEach(function (i) {
-      controls.createMenuItem.call(_this13, {
+      controls.createMenuItem.call(_this12, {
         value: i,
         list: t,
         type: e,
-        title: controls.getLabel.call(_this13, "speed", i)
+        title: controls.getLabel.call(_this12, "speed", i)
       });
     }), controls.updateSetting.call(this, e, t));
   },
@@ -9640,7 +9667,7 @@ var controls = {
     if (!is.element(t) || !is.element(i)) return;
     var s = t.hidden;
     var n = s;
-    if (is.boolean(e)) n = e;else if (is.keyboardEvent(e) && 27 === e.which) n = !1;else if (is.event(e)) {
+    if (is.boolean(e)) n = e;else if (is.keyboardEvent(e) && "Escape" === e.key) n = !1;else if (is.event(e)) {
       var _s2 = is.function(e.composedPath) ? e.composedPath()[0] : e.target,
           r = t.contains(_s2);
 
@@ -9659,7 +9686,7 @@ var controls = {
     };
   },
   showMenuPanel: function showMenuPanel() {
-    var _this14 = this;
+    var _this13 = this;
 
     var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
     var t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : !1;
@@ -9675,7 +9702,7 @@ var controls = {
 
       var _e9 = controls.getMenuSize.call(this, i),
           _t5 = function _t5(e) {
-        e.target === s && ["width", "height"].includes(e.propertyName) && (s.style.width = "", s.style.height = "", off.call(_this14, s, transitionEndEvent, _t5));
+        e.target === s && ["width", "height"].includes(e.propertyName) && (s.style.width = "", s.style.height = "", off.call(_this13, s, transitionEndEvent, _t5));
       };
 
       on.call(this, s, transitionEndEvent, _t5), s.style.width = "".concat(_e9.width, "px"), s.style.height = "".concat(_e9.height, "px");
@@ -9688,7 +9715,7 @@ var controls = {
     is.element(e) && e.setAttribute("href", this.download);
   },
   create: function create(e) {
-    var _this15 = this;
+    var _this14 = this;
 
     var t = controls.bindMenuItemShortcuts,
         i = controls.createButton,
@@ -9705,50 +9732,50 @@ var controls = {
       class: "plyr__controls__item"
     };
     return dedupe(is.array(this.config.controls) ? this.config.controls : []).forEach(function (a) {
-      if ("restart" === a && c.appendChild(i.call(_this15, "restart", u)), "rewind" === a && c.appendChild(i.call(_this15, "rewind", u)), "play" === a && c.appendChild(i.call(_this15, "play", u)), "fast-forward" === a && c.appendChild(i.call(_this15, "fast-forward", u)), "progress" === a) {
+      if ("restart" === a && c.appendChild(i.call(_this14, "restart", u)), "rewind" === a && c.appendChild(i.call(_this14, "rewind", u)), "play" === a && c.appendChild(i.call(_this14, "play", u)), "fast-forward" === a && c.appendChild(i.call(_this14, "fast-forward", u)), "progress" === a) {
         var _t6 = createElement("div", {
           class: "".concat(u.class, " plyr__progress__container")
         }),
-            _i3 = createElement("div", getAttributesFromSelector(_this15.config.selectors.progress));
+            _i2 = createElement("div", getAttributesFromSelector(_this14.config.selectors.progress));
 
-        if (_i3.appendChild(n.call(_this15, "seek", {
+        if (_i2.appendChild(n.call(_this14, "seek", {
           id: "plyr-seek-".concat(e.id)
-        })), _i3.appendChild(s.call(_this15, "buffer")), _this15.config.tooltips.seek) {
+        })), _i2.appendChild(s.call(_this14, "buffer")), _this14.config.tooltips.seek) {
           var _e10 = createElement("span", {
-            class: _this15.config.classNames.tooltip
+            class: _this14.config.classNames.tooltip
           }, "00:00");
 
-          _i3.appendChild(_e10), _this15.elements.display.seekTooltip = _e10;
+          _i2.appendChild(_e10), _this14.elements.display.seekTooltip = _e10;
         }
 
-        _this15.elements.progress = _i3, _t6.appendChild(_this15.elements.progress), c.appendChild(_t6);
+        _this14.elements.progress = _i2, _t6.appendChild(_this14.elements.progress), c.appendChild(_t6);
       }
 
-      if ("current-time" === a && c.appendChild(r.call(_this15, "currentTime", u)), "duration" === a && c.appendChild(r.call(_this15, "duration", u)), "mute" === a || "volume" === a) {
-        var _t7 = _this15.elements.volume;
+      if ("current-time" === a && c.appendChild(r.call(_this14, "currentTime", u)), "duration" === a && c.appendChild(r.call(_this14, "duration", u)), "mute" === a || "volume" === a) {
+        var _t7 = _this14.elements.volume;
 
         if (is.element(_t7) && c.contains(_t7) || (_t7 = createElement("div", extend({}, u, {
           class: "".concat(u.class, " plyr__volume").trim()
-        })), _this15.elements.volume = _t7, c.appendChild(_t7)), "mute" === a && _t7.appendChild(i.call(_this15, "mute")), "volume" === a && !browser.isIos) {
-          var _i4 = {
+        })), _this14.elements.volume = _t7, c.appendChild(_t7)), "mute" === a && _t7.appendChild(i.call(_this14, "mute")), "volume" === a && !browser.isIos) {
+          var _i3 = {
             max: 1,
             step: .05,
-            value: _this15.config.volume
+            value: _this14.config.volume
           };
 
-          _t7.appendChild(n.call(_this15, "volume", extend(_i4, {
+          _t7.appendChild(n.call(_this14, "volume", extend(_i3, {
             id: "plyr-volume-".concat(e.id)
           })));
         }
       }
 
-      if ("captions" === a && c.appendChild(i.call(_this15, "captions", u)), "settings" === a && !is.empty(_this15.config.settings)) {
+      if ("captions" === a && c.appendChild(i.call(_this14, "captions", u)), "settings" === a && !is.empty(_this14.config.settings)) {
         var _s3 = createElement("div", extend({}, u, {
           class: "".concat(u.class, " plyr__menu").trim(),
           hidden: ""
         }));
 
-        _s3.appendChild(i.call(_this15, "settings", {
+        _s3.appendChild(i.call(_this14, "settings", {
           "aria-haspopup": !0,
           "aria-controls": "plyr-settings-".concat(e.id),
           "aria-expanded": !1
@@ -9767,20 +9794,20 @@ var controls = {
           role: "menu"
         });
 
-        _a.appendChild(_o), _r2.appendChild(_a), _this15.elements.settings.panels.home = _a, _this15.config.settings.forEach(function (i) {
-          var s = createElement("button", extend(getAttributesFromSelector(_this15.config.selectors.buttons.settings), {
+        _a.appendChild(_o), _r2.appendChild(_a), _this14.elements.settings.panels.home = _a, _this14.config.settings.forEach(function (i) {
+          var s = createElement("button", extend(getAttributesFromSelector(_this14.config.selectors.buttons.settings), {
             type: "button",
-            class: "".concat(_this15.config.classNames.control, " ").concat(_this15.config.classNames.control, "--forward"),
+            class: "".concat(_this14.config.classNames.control, " ").concat(_this14.config.classNames.control, "--forward"),
             role: "menuitem",
             "aria-haspopup": !0,
             hidden: ""
           }));
-          t.call(_this15, s, i), on.call(_this15, s, "click", function () {
-            l.call(_this15, i, !1);
+          t.call(_this14, s, i), on.call(_this14, s, "click", function () {
+            l.call(_this14, i, !1);
           });
-          var n = createElement("span", null, i18n.get(i, _this15.config)),
+          var n = createElement("span", null, i18n.get(i, _this14.config)),
               a = createElement("span", {
-            class: _this15.config.classNames.menu.value
+            class: _this14.config.classNames.menu.value
           });
           a.innerHTML = e[i], n.appendChild(a), s.appendChild(n), _o.appendChild(s);
           var c = createElement("div", {
@@ -9789,42 +9816,42 @@ var controls = {
           }),
               u = createElement("button", {
             type: "button",
-            class: "".concat(_this15.config.classNames.control, " ").concat(_this15.config.classNames.control, "--back")
+            class: "".concat(_this14.config.classNames.control, " ").concat(_this14.config.classNames.control, "--back")
           });
           u.appendChild(createElement("span", {
             "aria-hidden": !0
-          }, i18n.get(i, _this15.config))), u.appendChild(createElement("span", {
-            class: _this15.config.classNames.hidden
-          }, i18n.get("menuBack", _this15.config))), on.call(_this15, c, "keydown", function (e) {
-            37 === e.which && (e.preventDefault(), e.stopPropagation(), l.call(_this15, "home", !0));
-          }, !1), on.call(_this15, u, "click", function () {
-            l.call(_this15, "home", !1);
+          }, i18n.get(i, _this14.config))), u.appendChild(createElement("span", {
+            class: _this14.config.classNames.hidden
+          }, i18n.get("menuBack", _this14.config))), on.call(_this14, c, "keydown", function (e) {
+            "ArrowLeft" === e.key && (e.preventDefault(), e.stopPropagation(), l.call(_this14, "home", !0));
+          }, !1), on.call(_this14, u, "click", function () {
+            l.call(_this14, "home", !1);
           }), c.appendChild(u), c.appendChild(createElement("div", {
             role: "menu"
-          })), _r2.appendChild(c), _this15.elements.settings.buttons[i] = s, _this15.elements.settings.panels[i] = c;
-        }), _n2.appendChild(_r2), _s3.appendChild(_n2), c.appendChild(_s3), _this15.elements.settings.popup = _n2, _this15.elements.settings.menu = _s3;
+          })), _r2.appendChild(c), _this14.elements.settings.buttons[i] = s, _this14.elements.settings.panels[i] = c;
+        }), _n2.appendChild(_r2), _s3.appendChild(_n2), c.appendChild(_s3), _this14.elements.settings.popup = _n2, _this14.elements.settings.menu = _s3;
       }
 
-      if ("pip" === a && support.pip && c.appendChild(i.call(_this15, "pip", u)), "airplay" === a && support.airplay && c.appendChild(i.call(_this15, "airplay", u)), "download" === a) {
+      if ("pip" === a && support.pip && c.appendChild(i.call(_this14, "pip", u)), "airplay" === a && support.airplay && c.appendChild(i.call(_this14, "airplay", u)), "download" === a) {
         var _e11 = extend({}, u, {
           element: "a",
-          href: _this15.download,
+          href: _this14.download,
           target: "_blank"
         });
 
-        _this15.isHTML5 && (_e11.download = "");
-        var _t8 = _this15.config.urls.download;
-        !is.url(_t8) && _this15.isEmbed && extend(_e11, {
-          icon: "logo-".concat(_this15.provider),
-          label: _this15.provider
-        }), c.appendChild(i.call(_this15, "download", _e11));
+        _this14.isHTML5 && (_e11.download = "");
+        var _t8 = _this14.config.urls.download;
+        !is.url(_t8) && _this14.isEmbed && extend(_e11, {
+          icon: "logo-".concat(_this14.provider),
+          label: _this14.provider
+        }), c.appendChild(i.call(_this14, "download", _e11));
       }
 
-      "fullscreen" === a && c.appendChild(i.call(_this15, "fullscreen", u));
+      "fullscreen" === a && c.appendChild(i.call(_this14, "fullscreen", u));
     }), this.isHTML5 && a.call(this, html5.getQualityOptions.call(this)), o.call(this), c;
   },
   inject: function inject() {
-    var _this16 = this;
+    var _this15 = this;
 
     if (this.config.loadSprite) {
       var _e12 = controls.getIconUrl.call(this);
@@ -9851,10 +9878,10 @@ var controls = {
     var s;
     i && is.string(this.config.controls) && (e = function (e) {
       var i = e;
-      return Object.entries(t).forEach(function (_ref10) {
-        var _ref11 = _slicedToArray(_ref10, 2),
-            e = _ref11[0],
-            t = _ref11[1];
+      return Object.entries(t).forEach(function (_ref11) {
+        var _ref12 = _slicedToArray(_ref11, 2),
+            e = _ref12[0],
+            t = _ref12[1];
 
         i = replaceAll(i, "{".concat(e, "}"), t);
       }), i;
@@ -9862,7 +9889,7 @@ var controls = {
 
     if (s[is.element(e) ? "insertAdjacentElement" : "insertAdjacentHTML"]("afterbegin", e), is.element(this.elements.controls) || controls.findElements.call(this), !is.empty(this.elements.buttons)) {
       var _e13 = function _e13(e) {
-        var t = _this16.config.classNames.controlPressed;
+        var t = _this15.config.classNames.controlPressed;
         Object.defineProperty(e, "pressed", {
           enumerable: !0,
           get: function get() {
@@ -9884,13 +9911,61 @@ var controls = {
       var _this$config = this.config,
           _e14 = _this$config.classNames,
           _t9 = _this$config.selectors,
-          _i5 = "".concat(_t9.controls.wrapper, " ").concat(_t9.labels, " .").concat(_e14.hidden),
-          _s4 = getElements.call(this, _i5);
+          _i4 = "".concat(_t9.controls.wrapper, " ").concat(_t9.labels, " .").concat(_e14.hidden),
+          _s4 = getElements.call(this, _i4);
 
       Array.from(_s4).forEach(function (e) {
-        toggleClass(e, _this16.config.classNames.hidden, !1), toggleClass(e, _this16.config.classNames.tooltip, !0);
+        toggleClass(e, _this15.config.classNames.hidden, !1), toggleClass(e, _this15.config.classNames.tooltip, !0);
       });
     }
+  },
+  setMediaMetadata: function setMediaMetadata() {
+    try {
+      "mediaSession" in navigator && (navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: this.config.mediaMetadata.title,
+        artist: this.config.mediaMetadata.artist,
+        album: this.config.mediaMetadata.album,
+        artwork: this.config.mediaMetadata.artwork
+      }));
+    } catch (e) {}
+  },
+  setMarkers: function setMarkers() {
+    var _this16 = this;
+
+    var e, t;
+    if (!this.duration || this.elements.markers) return;
+    var i = null === (e = this.config.markers) || void 0 === e || null === (t = e.points) || void 0 === t ? void 0 : t.filter(function (_ref13) {
+      var e = _ref13.time;
+      return e > 0 && e < _this16.duration;
+    });
+    if (null == i || !i.length) return;
+    var s = document.createDocumentFragment(),
+        n = document.createDocumentFragment();
+    var r = null;
+
+    var a = "".concat(this.config.classNames.tooltip, "--visible"),
+        o = function o(e) {
+      return toggleClass(r, a, e);
+    };
+
+    i.forEach(function (e) {
+      var t = createElement("span", {
+        class: _this16.config.classNames.marker
+      }, ""),
+          i = e.time / _this16.duration * 100 + "%";
+      r && (t.addEventListener("mouseenter", function () {
+        e.label || (r.style.left = i, r.innerHTML = e.label, o(!0));
+      }), t.addEventListener("mouseleave", function () {
+        o(!1);
+      })), t.addEventListener("click", function () {
+        _this16.currentTime = e.time;
+      }), t.style.left = i, n.appendChild(t);
+    }), s.appendChild(n), this.config.tooltips.seek || (r = createElement("span", {
+      class: this.config.classNames.tooltip
+    }, ""), s.appendChild(r)), this.elements.markers = {
+      points: n,
+      tip: r
+    }, this.elements.progress.appendChild(s);
   }
 };
 
@@ -9913,10 +9988,10 @@ function parseUrl(e) {
 
 function buildUrlParams(e) {
   var t = new URLSearchParams();
-  return is.object(e) && Object.entries(e).forEach(function (_ref12) {
-    var _ref13 = _slicedToArray(_ref12, 2),
-        e = _ref13[0],
-        i = _ref13[1];
+  return is.object(e) && Object.entries(e).forEach(function (_ref14) {
+    var _ref15 = _slicedToArray(_ref14, 2),
+        e = _ref15[0],
+        i = _ref15[1];
 
     t.set(e, i);
   }), t;
@@ -9983,7 +10058,7 @@ var captions = {
       }), "showing" === e.mode && (e.mode = "hidden"), on.call(_this17, e, "cuechange", function () {
         return captions.updateCues.call(_this17);
       });
-    }), (r && this.language !== i || !e.includes(n)) && (captions.setLanguage.call(this, i), captions.toggle.call(this, t && r)), toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(e)), is.array(this.config.controls) && this.config.controls.includes("settings") && this.config.settings.includes("captions") && controls.setCaptionsMenu.call(this);
+    }), (r && this.language !== i || !e.includes(n)) && (captions.setLanguage.call(this, i), captions.toggle.call(this, t && r)), this.elements && toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(e)), is.array(this.config.controls) && this.config.controls.includes("settings") && this.config.settings.includes("captions") && controls.setCaptionsMenu.call(this);
   },
   toggle: function toggle(e) {
     var _this18 = this;
@@ -10021,8 +10096,8 @@ var captions = {
             this.captions.currentTrack = e;
 
             var s = i[e],
-                _ref14 = s || {},
-                n = _ref14.language;
+                _ref16 = s || {},
+                n = _ref16.language;
 
             this.captions.currentTrackNode = s, controls.updateSetting.call(this, "captions"), t || (this.captions.language = n, this.storage.set({
               language: n
@@ -10128,7 +10203,7 @@ var captions = {
   disableContextMenu: !0,
   loadSprite: !0,
   iconPrefix: "plyr",
-  iconUrl: "https://cdn.plyr.io/3.6.7/plyr.svg",
+  iconUrl: "https://cdn.plyr.io/3.7.2/plyr.svg",
   blankVideo: "https://cdn.plyr.io/static/blank.mp4",
   quality: {
     default: 576,
@@ -10307,6 +10382,7 @@ var captions = {
     hover: "plyr--hover",
     tooltip: "plyr__tooltip",
     cues: "plyr__cues",
+    marker: "plyr__progress__marker",
     hidden: "plyr__sr-only",
     hideControls: "plyr--hide-controls",
     isIos: "plyr--is-ios",
@@ -10350,7 +10426,8 @@ var captions = {
   attributes: {
     embed: {
       provider: "data-plyr-provider",
-      id: "data-plyr-embed-id"
+      id: "data-plyr-embed-id",
+      hash: "data-plyr-embed-hash"
     }
   },
   ads: {
@@ -10379,6 +10456,16 @@ var captions = {
     modestbranding: 1,
     customControls: !0,
     noCookie: !1
+  },
+  mediaMetadata: {
+    title: "",
+    artist: "",
+    album: "",
+    artwork: []
+  },
+  markers: {
+    enabled: !1,
+    points: []
   }
 },
     pip = {
@@ -10460,12 +10547,12 @@ var Fullscreen = /*#__PURE__*/function () {
 
       _this21.onChange();
     }), _defineProperty$1(this, "trapFocus", function (e) {
-      if (browser.isIos || !_this21.active || "Tab" !== e.key || 9 !== e.keyCode) return;
+      if (browser.isIos || !_this21.active || "Tab" !== e.key) return;
 
       var t = document.activeElement,
           i = getElements.call(_this21.player, "a[href], button:not(:disabled), input:not(:disabled), [tabindex]"),
-          _i6 = _slicedToArray(i, 1),
-          s = _i6[0],
+          _i5 = _slicedToArray(i, 1),
+          s = _i5[0],
           n = i[i.length - 1];
 
       t !== n || e.shiftKey ? t === s && e.shiftKey && (n.focus(), e.preventDefault()) : (s.focus(), e.preventDefault());
@@ -10518,7 +10605,7 @@ var Fullscreen = /*#__PURE__*/function () {
     get: function get() {
       if (!this.enabled) return !1;
       if (!Fullscreen.native || this.forceFallback) return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
-      var e = this.prefix ? document["".concat(this.prefix).concat(this.property, "Element")] : document.fullscreenElement;
+      var e = this.prefix ? this.target.getRootNode()["".concat(this.prefix).concat(this.property, "Element")] : this.target.getRootNode().fullscreenElement;
       return e && e.shadowRoot ? e === this.target.getRootNode().host : e === this.target;
     }
   }, {
@@ -10578,9 +10665,9 @@ var ui = {
     var _this22 = this;
 
     if (this.listeners.media(), !this.supported.ui) return this.debug.warn("Basic support only for ".concat(this.provider, " ").concat(this.type)), void ui.toggleNativeControls.call(this, !0);
-    is.element(this.elements.controls) || (controls.inject.call(this), this.listeners.controls()), ui.toggleNativeControls.call(this), this.isHTML5 && captions.setup.call(this), this.volume = null, this.muted = null, this.loop = null, this.quality = null, this.speed = null, controls.updateVolume.call(this), controls.timeUpdate.call(this), ui.checkPlaying.call(this), toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo), toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5), toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos), toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch), this.ready = !0, setTimeout(function () {
+    is.element(this.elements.controls) || (controls.inject.call(this), this.listeners.controls()), ui.toggleNativeControls.call(this), this.isHTML5 && captions.setup.call(this), this.volume = null, this.muted = null, this.loop = null, this.quality = null, this.speed = null, controls.updateVolume.call(this), controls.timeUpdate.call(this), controls.durationUpdate.call(this), ui.checkPlaying.call(this), toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo), toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5), toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos), toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch), this.ready = !0, setTimeout(function () {
       triggerEvent.call(_this22, _this22.media, "ready");
-    }, 0), ui.setTitle.call(this), this.poster && ui.setPoster.call(this, this.poster, !1).catch(function () {}), this.config.duration && controls.durationUpdate.call(this);
+    }, 0), ui.setTitle.call(this), this.poster && ui.setPoster.call(this, this.poster, !1).catch(function () {}), this.config.duration && controls.durationUpdate.call(this), this.config.mediaMetadata && controls.setMediaMetadata.call(this);
   },
   setTitle: function setTitle() {
     var e = i18n.get("play", this.config);
@@ -10664,14 +10751,17 @@ var Listeners = /*#__PURE__*/function () {
       e.touch = !0, toggleClass(t.container, e.config.classNames.isTouch, !0);
     }), _defineProperty$1(this, "setTabFocus", function (e) {
       var t = _this27.player,
-          i = t.elements;
-      if (clearTimeout(_this27.focusTimer), "keydown" === e.type && 9 !== e.which) return;
-      "keydown" === e.type && (_this27.lastKeyDown = e.timeStamp);
-      var s = e.timeStamp - _this27.lastKeyDown <= 20;
-      ("focus" !== e.type || s) && (function () {
+          i = t.elements,
+          s = e.key,
+          n = e.type,
+          r = e.timeStamp;
+      if (clearTimeout(_this27.focusTimer), "keydown" === n && "Tab" !== s) return;
+      "keydown" === n && (_this27.lastKeyDown = r);
+      var a = r - _this27.lastKeyDown <= 20;
+      ("focus" !== n || a) && (function () {
         var e = t.config.classNames.tabFocus;
         toggleClass(getElements.call(t, ".".concat(e)), e, !1);
-      }(), "focusout" !== e.type && (_this27.focusTimer = setTimeout(function () {
+      }(), "focusout" !== n && (_this27.focusTimer = setTimeout(function () {
         var e = document.activeElement;
         i.container.contains(e) && toggleClass(document.activeElement, t.config.classNames.tabFocus, !0);
       }, 10)));
@@ -10693,44 +10783,37 @@ var Listeners = /*#__PURE__*/function () {
         }, r);
       });
 
-      var n = function n(t) {
-        if (!t) return setAspectRatio.call(e);
-        var s = i.container.getBoundingClientRect(),
-            n = s.width,
-            r = s.height;
-        return setAspectRatio.call(e, "".concat(n, ":").concat(r));
+      var n = function n() {
+        if (!e.isVimeo || e.config.vimeo.premium) return;
+
+        var t = i.wrapper,
+            s = e.fullscreen.active,
+            _getAspectRatio$call = getAspectRatio.call(e),
+            _getAspectRatio$call2 = _slicedToArray(_getAspectRatio$call, 2),
+            n = _getAspectRatio$call2[0],
+            r = _getAspectRatio$call2[1],
+            a = supportsCSS("aspect-ratio: ".concat(n, " / ").concat(r));
+
+        if (!s) return void (a ? (t.style.width = null, t.style.height = null) : (t.style.maxWidth = null, t.style.margin = null));
+
+        var _getViewportSize = getViewportSize(),
+            _getViewportSize2 = _slicedToArray(_getViewportSize, 2),
+            o = _getViewportSize2[0],
+            l = _getViewportSize2[1],
+            c = o / l > n / r;
+
+        a ? (t.style.width = c ? "auto" : "100%", t.style.height = c ? "100%" : "auto") : (t.style.maxWidth = c ? l / r * n + "px" : null, t.style.margin = c ? "0 auto" : null);
       },
           r = function r() {
         clearTimeout(s.resized), s.resized = setTimeout(n, 50);
       };
 
       on.call(e, i.container, "enterfullscreen exitfullscreen", function (t) {
-        var _e$fullscreen = e.fullscreen,
-            s = _e$fullscreen.target,
-            a = _e$fullscreen.usingNative;
+        var s = e.fullscreen.target;
         if (s !== i.container) return;
         if (!e.isEmbed && is.empty(e.config.ratio)) return;
-
-        var o = "enterfullscreen" === t.type,
-            _n3 = n(o),
-            l = _n3.padding,
-            c = _n3.ratio;
-
-        (function (t, i, s) {
-          if (!e.isVimeo || e.config.vimeo.premium) return;
-
-          var n = e.elements.wrapper.firstChild,
-              _t11 = _slicedToArray(t, 2),
-              r = _t11[1],
-              _getAspectRatio$call = getAspectRatio.call(e),
-              _getAspectRatio$call2 = _slicedToArray(_getAspectRatio$call, 2),
-              a = _getAspectRatio$call2[0],
-              o = _getAspectRatio$call2[1];
-
-          n.style.maxWidth = s ? r / o * a + "px" : null, n.style.margin = s ? "0 auto" : null;
-        })(c, 0, o), o && setTimeout(function () {
-          return repaint(i.container);
-        }, 100), a || (o ? on.call(e, window, "resize", r) : off.call(e, window, "resize", r));
+        n();
+        ("enterfullscreen" === t.type ? on : off).call(e, window, "resize", r);
       });
     }), _defineProperty$1(this, "media", function () {
       var e = _this27.player,
@@ -10751,11 +10834,11 @@ var Listeners = /*#__PURE__*/function () {
       }), on.call(e, e.media, "waiting canplay seeked playing", function (t) {
         return ui.checkLoading.call(e, t);
       }), e.supported.ui && e.config.clickToPlay && !e.isAudio) {
-        var _i7 = getElement.call(e, ".".concat(e.config.classNames.video));
+        var _i6 = getElement.call(e, ".".concat(e.config.classNames.video));
 
-        if (!is.element(_i7)) return;
+        if (!is.element(_i6)) return;
         on.call(e, t.container, "click", function (s) {
-          ([t.container, _i7].includes(s.target) || _i7.contains(s.target)) && (e.touch && e.config.hideControls || (e.ended ? (_this27.proxy(s, e.restart, "restart"), _this27.proxy(s, function () {
+          ([t.container, _i6].includes(s.target) || _i6.contains(s.target)) && (e.touch && e.config.hideControls || (e.ended ? (_this27.proxy(s, e.restart, "restart"), _this27.proxy(s, function () {
             silencePromise(e.play());
           }, "play")) : _this27.proxy(s, function () {
             silencePromise(e.togglePlay());
@@ -10824,27 +10907,25 @@ var Listeners = /*#__PURE__*/function () {
       }, "pip"), _this27.bind(t.buttons.airplay, "click", e.airplay, "airplay"), _this27.bind(t.buttons.settings, "click", function (t) {
         t.stopPropagation(), t.preventDefault(), controls.toggleMenu.call(e, t);
       }, null, !1), _this27.bind(t.buttons.settings, "keyup", function (t) {
-        var i = t.which;
-        [13, 32].includes(i) && (13 !== i ? (t.preventDefault(), t.stopPropagation(), controls.toggleMenu.call(e, t)) : controls.focusFirstMenuItem.call(e, null, !0));
+        ["Space", "Enter"].includes(t.key) && ("Enter" !== t.key ? (t.preventDefault(), t.stopPropagation(), controls.toggleMenu.call(e, t)) : controls.focusFirstMenuItem.call(e, null, !0));
       }, null, !1), _this27.bind(t.settings.menu, "keydown", function (t) {
-        27 === t.which && controls.toggleMenu.call(e, t);
+        "Escape" === t.key && controls.toggleMenu.call(e, t);
       }), _this27.bind(t.inputs.seek, "mousedown mousemove", function (e) {
         var i = t.progress.getBoundingClientRect(),
             s = 100 / i.width * (e.pageX - i.left);
         e.currentTarget.setAttribute("seek-value", s);
       }), _this27.bind(t.inputs.seek, "mousedown mouseup keydown keyup touchstart touchend", function (t) {
         var i = t.currentTarget,
-            s = t.keyCode ? t.keyCode : t.which,
-            n = "play-on-seeked";
-        if (is.keyboardEvent(t) && 39 !== s && 37 !== s) return;
+            s = "play-on-seeked";
+        if (is.keyboardEvent(t) && !["ArrowLeft", "ArrowRight"].includes(t.key)) return;
         e.lastSeekTime = Date.now();
-        var r = i.hasAttribute(n),
-            a = ["mouseup", "touchend", "keyup"].includes(t.type);
-        r && a ? (i.removeAttribute(n), silencePromise(e.play())) : !a && e.playing && (i.setAttribute(n, ""), e.pause());
+        var n = i.hasAttribute(s),
+            r = ["mouseup", "touchend", "keyup"].includes(t.type);
+        n && r ? (i.removeAttribute(s), silencePromise(e.play())) : !r && e.playing && (i.setAttribute(s, ""), e.pause());
       }), browser.isIos) {
-        var _t12 = getElements.call(e, 'input[type="range"]');
+        var _t11 = getElements.call(e, 'input[type="range"]');
 
-        Array.from(_t12).forEach(function (e) {
+        Array.from(_t11).forEach(function (e) {
           return _this27.bind(e, i, function (e) {
             return repaint(e.target);
           });
@@ -10883,7 +10964,7 @@ var Listeners = /*#__PURE__*/function () {
         return !e.contains(t.container);
       }).forEach(function (i) {
         _this27.bind(i, "mouseenter mouseleave", function (i) {
-          t.controls.hover = !e.touch && "mouseenter" === i.type;
+          t.controls && (t.controls.hover = !e.touch && "mouseenter" === i.type);
         });
       }), _this27.bind(t.controls, "mousedown mouseup touchstart touchend touchcancel", function (e) {
         t.controls.pressed = ["mousedown", "touchstart"].includes(e.type);
@@ -10919,75 +11000,82 @@ var Listeners = /*#__PURE__*/function () {
     value: function handleKey(e) {
       var t = this.player,
           i = t.elements,
-          s = e.keyCode ? e.keyCode : e.which,
-          n = "keydown" === e.type,
-          r = n && s === this.lastKey;
-      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-      if (!is.number(s)) return;
+          s = e.key,
+          n = e.type,
+          r = e.altKey,
+          a = e.ctrlKey,
+          o = e.metaKey,
+          l = e.shiftKey,
+          c = "keydown" === n,
+          u = c && s === this.lastKey;
+      if (r || a || o || l) return;
+      if (!s) return;
 
-      if (n) {
-        var _n4 = document.activeElement;
+      if (c) {
+        var _n3 = document.activeElement;
 
-        if (is.element(_n4)) {
+        if (is.element(_n3)) {
           var _s5 = t.config.selectors.editable,
               _r3 = i.inputs.seek;
-          if (_n4 !== _r3 && matches(_n4, _s5)) return;
-          if (32 === e.which && matches(_n4, 'button, [role^="menuitem"]')) return;
+          if (_n3 !== _r3 && matches(_n3, _s5)) return;
+          if ("Space" === e.key && matches(_n3, 'button, [role^="menuitem"]')) return;
         }
 
-        switch ([32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79].includes(s) && (e.preventDefault(), e.stopPropagation()), s) {
-          case 48:
-          case 49:
-          case 50:
-          case 51:
-          case 52:
-          case 53:
-          case 54:
-          case 55:
-          case 56:
-          case 57:
-            r || (t.currentTime = t.duration / 10 * (s - 48));
+        switch (["Space", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "c", "f", "k", "l", "m"].includes(s) && (e.preventDefault(), e.stopPropagation()), s) {
+          case "0":
+          case "1":
+          case "2":
+          case "3":
+          case "4":
+          case "5":
+          case "6":
+          case "7":
+          case "8":
+          case "9":
+            u || (d = parseInt(s, 10), t.currentTime = t.duration / 10 * d);
             break;
 
-          case 32:
-          case 75:
-            r || silencePromise(t.togglePlay());
+          case "Space":
+          case "k":
+            u || silencePromise(t.togglePlay());
             break;
 
-          case 38:
+          case "ArrowUp":
             t.increaseVolume(.1);
             break;
 
-          case 40:
+          case "ArrowDown":
             t.decreaseVolume(.1);
             break;
 
-          case 77:
-            r || (t.muted = !t.muted);
+          case "m":
+            u || (t.muted = !t.muted);
             break;
 
-          case 39:
+          case "ArrowRight":
             t.forward();
             break;
 
-          case 37:
+          case "ArrowLeft":
             t.rewind();
             break;
 
-          case 70:
+          case "f":
             t.fullscreen.toggle();
             break;
 
-          case 67:
-            r || t.toggleCaptions();
+          case "c":
+            u || t.toggleCaptions();
             break;
 
-          case 76:
+          case "l":
             t.loop = !t.loop;
         }
 
-        27 === s && !t.fullscreen.usingNative && t.fullscreen.active && t.fullscreen.toggle(), this.lastKey = s;
+        "Escape" === s && !t.fullscreen.usingNative && t.fullscreen.active && t.fullscreen.toggle(), this.lastKey = s;
       } else this.lastKey = null;
+
+      var d;
     }
   }, {
     key: "toggleMenu",
@@ -11137,6 +11225,11 @@ function parseId$1(e) {
   return e.match(/^.*(vimeo.com\/|video\/)(\d+).*/) ? RegExp.$2 : e;
 }
 
+function parseHash(e) {
+  var t = e.match(/^.*(vimeo.com\/|video\/)(\d+)(\?.*&*h=|\/)+([\d,a-f]+)/);
+  return t && 5 === t.length ? t[4] : null;
+}
+
 function assurePlaybackState$1(e) {
   e && !this.embed.hasPlayed && (this.embed.hasPlayed = !0), this.media.paused === e && (this.media.paused = !e, triggerEvent.call(this, this.media, e ? "play" : "pause"));
 }
@@ -11159,33 +11252,37 @@ var vimeo = {
         s = t.referrerPolicy,
         n = _objectWithoutProperties(t, ["premium", "referrerPolicy"]);
 
+    var r = e.media.getAttribute("src"),
+        a = "";
+    is.empty(r) ? (r = e.media.getAttribute(e.config.attributes.embed.id), a = e.media.getAttribute(e.config.attributes.embed.hash)) : a = parseHash(r);
+    var o = a ? {
+      h: a
+    } : {};
     i && Object.assign(n, {
       controls: !1,
       sidedock: !1
     });
-    var r = buildUrlParams(_objectSpread2({
+    var l = buildUrlParams(_objectSpread2(_objectSpread2({
       loop: e.config.loop.active,
       autoplay: e.autoplay,
       muted: e.muted,
       gesture: "media",
       playsinline: !this.config.fullscreen.iosNative
-    }, n));
-    var a = e.media.getAttribute("src");
-    is.empty(a) && (a = e.media.getAttribute(e.config.attributes.embed.id));
-    var o = parseId$1(a),
-        l = createElement("iframe"),
-        c = format(e.config.urls.vimeo.iframe, o, r);
-    if (l.setAttribute("src", c), l.setAttribute("allowfullscreen", ""), l.setAttribute("allow", ["autoplay", "fullscreen", "picture-in-picture", "encrypted-media", "accelerometer", "gyroscope"].join("; ")), is.empty(s) || l.setAttribute("referrerPolicy", s), i || !t.customControls) l.setAttribute("data-poster", e.poster), e.media = replaceElement(l, e.media);else {
-      var _t13 = createElement("div", {
+    }, o), n)),
+        c = parseId$1(r),
+        u = createElement("iframe"),
+        d = format(e.config.urls.vimeo.iframe, c, l);
+    if (u.setAttribute("src", d), u.setAttribute("allowfullscreen", ""), u.setAttribute("allow", ["autoplay", "fullscreen", "picture-in-picture", "encrypted-media", "accelerometer", "gyroscope"].join("; ")), is.empty(s) || u.setAttribute("referrerPolicy", s), i || !t.customControls) u.setAttribute("data-poster", e.poster), e.media = replaceElement(u, e.media);else {
+      var _t12 = createElement("div", {
         class: e.config.classNames.embedContainer,
         "data-poster": e.poster
       });
 
-      _t13.appendChild(l), e.media = replaceElement(_t13, e.media);
+      _t12.appendChild(u), e.media = replaceElement(_t12, e.media);
     }
-    t.customControls || fetch(format(e.config.urls.vimeo.api, c)).then(function (t) {
+    t.customControls || fetch(format(e.config.urls.vimeo.api, d)).then(function (t) {
       !is.empty(t) && t.thumbnail_url && ui.setPoster.call(e, t.thumbnail_url).catch(function () {});
-    }), e.embed = new window.Vimeo.Player(l, {
+    }), e.embed = new window.Vimeo.Player(u, {
       autopause: e.config.autopause,
       muted: e.muted
     }), e.media.paused = !0, e.media.currentTime = 0, e.supported.ui && e.embed.disableTextTrack(), e.media.play = function () {
@@ -11195,10 +11292,10 @@ var vimeo = {
     }, e.media.stop = function () {
       e.pause(), e.currentTime = 0;
     };
-    var u = e.media.currentTime;
+    var h = e.media.currentTime;
     Object.defineProperty(e.media, "currentTime", {
       get: function get() {
-        return u;
+        return h;
       },
       set: function set(t) {
         var i = e.embed,
@@ -11215,70 +11312,70 @@ var vimeo = {
         }).catch(function () {});
       }
     });
-    var d = e.config.speed.selected;
+    var m = e.config.speed.selected;
     Object.defineProperty(e.media, "playbackRate", {
       get: function get() {
-        return d;
+        return m;
       },
       set: function set(t) {
         e.embed.setPlaybackRate(t).then(function () {
-          d = t, triggerEvent.call(e, e.media, "ratechange");
+          m = t, triggerEvent.call(e, e.media, "ratechange");
         }).catch(function () {
           e.options.speed = [1];
         });
       }
     });
-    var h = e.config.volume;
+    var p = e.config.volume;
     Object.defineProperty(e.media, "volume", {
       get: function get() {
-        return h;
+        return p;
       },
       set: function set(t) {
         e.embed.setVolume(t).then(function () {
-          h = t, triggerEvent.call(e, e.media, "volumechange");
+          p = t, triggerEvent.call(e, e.media, "volumechange");
         });
       }
     });
-    var m = e.config.muted;
+    var g = e.config.muted;
     Object.defineProperty(e.media, "muted", {
-      get: function get() {
-        return m;
-      },
-      set: function set(t) {
-        var i = !!is.boolean(t) && t;
-        e.embed.setVolume(i ? 0 : e.config.volume).then(function () {
-          m = i, triggerEvent.call(e, e.media, "volumechange");
-        });
-      }
-    });
-    var p,
-        g = e.config.loop;
-    Object.defineProperty(e.media, "loop", {
       get: function get() {
         return g;
       },
       set: function set(t) {
+        var i = !!is.boolean(t) && t;
+        e.embed.setVolume(i ? 0 : e.config.volume).then(function () {
+          g = i, triggerEvent.call(e, e.media, "volumechange");
+        });
+      }
+    });
+    var f,
+        y = e.config.loop;
+    Object.defineProperty(e.media, "loop", {
+      get: function get() {
+        return y;
+      },
+      set: function set(t) {
         var i = is.boolean(t) ? t : e.config.loop.active;
         e.embed.setLoop(i).then(function () {
-          g = i;
+          y = i;
         });
       }
     }), e.embed.getVideoUrl().then(function (t) {
-      p = t, controls.setDownloadUrl.call(e);
+      f = t, controls.setDownloadUrl.call(e);
     }).catch(function (e) {
       _this28.debug.warn(e);
     }), Object.defineProperty(e.media, "currentSrc", {
       get: function get() {
-        return p;
+        return f;
       }
     }), Object.defineProperty(e.media, "ended", {
       get: function get() {
         return e.currentTime === e.duration;
       }
     }), Promise.all([e.embed.getVideoWidth(), e.embed.getVideoHeight()]).then(function (t) {
-      var _t14 = _slicedToArray(t, 2),
-          i = _t14[0],
-          s = _t14[1];
+      var _t13 = _slicedToArray(t, 2),
+          i = _t13[0],
+          s = _t13[1];
 
       e.embed.ratio = roundAspectRatio(i, s), setAspectRatio.call(_this28);
     }), e.embed.setAutopause(e.config.autopause).then(function (t) {
@@ -11286,14 +11383,14 @@ var vimeo = {
     }), e.embed.getVideoTitle().then(function (t) {
       e.config.title = t, ui.setTitle.call(_this28);
     }), e.embed.getCurrentTime().then(function (t) {
-      u = t, triggerEvent.call(e, e.media, "timeupdate");
+      h = t, triggerEvent.call(e, e.media, "timeupdate");
     }), e.embed.getDuration().then(function (t) {
       e.media.duration = t, triggerEvent.call(e, e.media, "durationchange");
     }), e.embed.getTextTracks().then(function (t) {
       e.media.textTracks = t, captions.setup.call(e);
-    }), e.embed.on("cuechange", function (_ref15) {
-      var _ref15$cues = _ref15.cues,
-          t = _ref15$cues === void 0 ? [] : _ref15$cues;
+    }), e.embed.on("cuechange", function (_ref17) {
+      var _ref17$cues = _ref17.cues,
+          t = _ref17$cues === void 0 ? [] : _ref17$cues;
       var i = t.map(function (e) {
         return stripHTML(e.text);
       });
@@ -11313,7 +11410,7 @@ var vimeo = {
     }), e.embed.on("pause", function () {
       assurePlaybackState$1.call(e, !1);
     }), e.embed.on("timeupdate", function (t) {
-      e.media.seeking = !1, u = t.seconds, triggerEvent.call(e, e.media, "timeupdate");
+      e.media.seeking = !1, h = t.seconds, triggerEvent.call(e, e.media, "timeupdate");
     }), e.embed.on("progress", function (t) {
       e.media.buffered = t.percent, triggerEvent.call(e, e.media, "progress"), 1 === parseInt(t.percent, 10) && triggerEvent.call(e, e.media, "canplaythrough"), e.embed.getDuration().then(function (t) {
         t !== e.media.duration && (e.media.duration = t, triggerEvent.call(e, e.media, "durationchange"));
@@ -11386,14 +11483,14 @@ var youtube = {
     });
 
     if (e.media = replaceElement(r, e.media), t.customControls) {
-      var _t15 = function _t15(e) {
+      var _t14 = function _t14(e) {
         return "https://i.ytimg.com/vi/".concat(n, "/").concat(e, "default.jpg");
       };
 
-      loadImage(_t15("maxres"), 121).catch(function () {
-        return loadImage(_t15("sd"), 121);
+      loadImage(_t14("maxres"), 121).catch(function () {
+        return loadImage(_t14("sd"), 121);
       }).catch(function () {
-        return loadImage(_t15("hq"));
+        return loadImage(_t14("hq"));
       }).then(function (t) {
         return ui.setPoster.call(e, t.src);
       }).then(function (t) {
@@ -11417,17 +11514,17 @@ var youtube = {
       events: {
         onError: function onError(t) {
           if (!e.media.error) {
-            var _i8 = t.data,
+            var _i7 = t.data,
                 _s7 = {
               2: "The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.",
               5: "The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.",
               100: "The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.",
               101: "The owner of the requested video does not allow it to be played in embedded players.",
               150: "The owner of the requested video does not allow it to be played in embedded players."
-            }[_i8] || "An unknown error occured";
+            }[_i7] || "An unknown error occured";
 
             e.media.error = {
-              code: _i8,
+              code: _i7,
               message: _s7
             }, triggerEvent.call(e, e.media, "error");
           }
@@ -11734,6 +11831,13 @@ var Ads = /*#__PURE__*/function () {
   return Ads;
 }();
 
+function clamp() {
+  var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var i = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 255;
+  return Math.min(Math.max(e, t), i);
+}
+
 var parseVtt = function parseVtt(e) {
   var t = [];
   return e.split(/\r\n\r\n|\n\n|\r\r/).forEach(function (e) {
@@ -11741,16 +11845,16 @@ var parseVtt = function parseVtt(e) {
     e.split(/\r\n|\n|\r/).forEach(function (e) {
       if (is.number(i.startTime)) {
         if (!is.empty(e.trim()) && is.empty(i.text)) {
-          var _t17, _t18, _t16$1$split, _t16$1$split2;
+          var _t16, _t17, _t15$1$split, _t15$1$split2;
 
-          var _t16 = e.trim().split("#xywh=");
+          var _t15 = e.trim().split("#xywh=");
 
-          (_t17 = _t16, _t18 = _slicedToArray(_t17, 1), i.text = _t18[0], _t17), _t16[1] && (_t16$1$split = _t16[1].split(","), _t16$1$split2 = _slicedToArray(_t16$1$split, 4), i.x = _t16$1$split2[0], i.y = _t16$1$split2[1], i.w = _t16$1$split2[2], i.h = _t16$1$split2[3], _t16$1$split);
+          (_t16 = _t15, _t17 = _slicedToArray(_t16, 1), i.text = _t17[0], _t16), _t15[1] && (_t15$1$split = _t15[1].split(","), _t15$1$split2 = _slicedToArray(_t15$1$split, 4), i.x = _t15$1$split2[0], i.y = _t15$1$split2[1], i.w = _t15$1$split2[2], i.h = _t15$1$split2[3], _t15$1$split);
         }
       } else {
-        var _t19 = e.match(/([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})/);
+        var _t18 = e.match(/([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})/);
 
-        _t19 && (i.startTime = 60 * Number(_t19[1] || 0) * 60 + 60 * Number(_t19[2]) + Number(_t19[3]) + Number("0.".concat(_t19[4])), i.endTime = 60 * Number(_t19[6] || 0) * 60 + 60 * Number(_t19[7]) + Number(_t19[8]) + Number("0.".concat(_t19[9])));
+        _t18 && (i.startTime = 60 * Number(_t18[1] || 0) * 60 + 60 * Number(_t18[2]) + Number(_t18[3]) + Number("0.".concat(_t18[4])), i.endTime = 60 * Number(_t18[6] || 0) * 60 + 60 * Number(_t18[7]) + Number(_t18[8]) + Number("0.".concat(_t18[9])));
       }
     }), i.text && t.push(i);
   }), t;
@@ -11809,10 +11913,17 @@ var PreviewThumbnails = /*#__PURE__*/function () {
     }), _defineProperty$1(this, "startMove", function (e) {
       if (_this32.loaded && is.event(e) && ["touchmove", "mousemove"].includes(e.type) && _this32.player.media.duration) {
         if ("touchmove" === e.type) _this32.seekTime = _this32.player.media.duration * (_this32.player.elements.inputs.seek.value / 100);else {
-          var t = _this32.player.elements.progress.getBoundingClientRect(),
-              i = 100 / t.width * (e.pageX - t.left);
+          var t, i;
 
-          _this32.seekTime = _this32.player.media.duration * (i / 100), _this32.seekTime < 0 && (_this32.seekTime = 0), _this32.seekTime > _this32.player.media.duration - 1 && (_this32.seekTime = _this32.player.media.duration - 1), _this32.mousePosX = e.pageX, _this32.elements.thumb.time.innerText = _formatTime(_this32.seekTime);
+          var s = _this32.player.elements.progress.getBoundingClientRect(),
+              n = 100 / s.width * (e.pageX - s.left);
+
+          _this32.seekTime = _this32.player.media.duration * (n / 100), _this32.seekTime < 0 && (_this32.seekTime = 0), _this32.seekTime > _this32.player.media.duration - 1 && (_this32.seekTime = _this32.player.media.duration - 1), _this32.mousePosX = e.pageX, _this32.elements.thumb.time.innerText = _formatTime(_this32.seekTime);
+          var r = null === (t = _this32.player.config.markers) || void 0 === t || null === (i = t.points) || void 0 === i ? void 0 : i.find(function (_ref18) {
+            var e = _ref18.time;
+            return e === Math.round(_this32.seekTime);
+          });
+          r && _this32.elements.thumb.time.insertAdjacentHTML("afterbegin", "".concat(r.label, "<br>"));
         }
 
         _this32.showImageAtCurrentTime();
@@ -11842,7 +11953,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
       var e = createElement("div", {
         class: _this32.player.config.classNames.previewThumbnails.timeContainer
       });
-      _this32.elements.thumb.time = createElement("span", {}, "00:00"), e.appendChild(_this32.elements.thumb.time), _this32.elements.thumb.container.appendChild(e), is.element(_this32.player.elements.progress) && _this32.player.elements.progress.appendChild(_this32.elements.thumb.container), _this32.elements.scrubbing.container = createElement("div", {
+      _this32.elements.thumb.time = createElement("span", {}, "00:00"), e.appendChild(_this32.elements.thumb.time), _this32.elements.thumb.imageContainer.appendChild(e), is.element(_this32.player.elements.progress) && _this32.player.elements.progress.appendChild(_this32.elements.thumb.container), _this32.elements.scrubbing.container = createElement("div", {
         class: _this32.player.config.classNames.previewThumbnails.scrubbingContainer
       }), _this32.player.elements.wrapper.appendChild(_this32.elements.scrubbing.container);
     }), _defineProperty$1(this, "destroy", function () {
@@ -11870,11 +11981,11 @@ var PreviewThumbnails = /*#__PURE__*/function () {
       if (_this32.currentImageElement && _this32.currentImageElement.dataset.filename === r) _this32.showImage(_this32.currentImageElement, n, e, t, r, !1), _this32.currentImageElement.dataset.index = t, _this32.removeOldImages(_this32.currentImageElement);else {
         _this32.loadingImage && _this32.usingSprites && (_this32.loadingImage.onload = null);
 
-        var _i9 = new Image();
+        var _i8 = new Image();
 
-        _i9.src = a, _i9.dataset.index = t, _i9.dataset.filename = r, _this32.showingThumbFilename = r, _this32.player.debug.log("Loading image: ".concat(a)), _i9.onload = function () {
-          return _this32.showImage(_i9, n, e, t, r, !0);
-        }, _this32.loadingImage = _i9, _this32.removeOldImages(_i9);
+        _i8.src = a, _i8.dataset.index = t, _i8.dataset.filename = r, _this32.showingThumbFilename = r, _this32.player.debug.log("Loading image: ".concat(a)), _i8.onload = function () {
+          return _this32.showImage(_i8, n, e, t, r, !0);
+        }, _this32.loadingImage = _i8, _this32.removeOldImages(_i8);
       }
     }), _defineProperty$1(this, "showImage", function (e, t, i, s, n) {
       var r = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : !0;
@@ -11910,9 +12021,9 @@ var PreviewThumbnails = /*#__PURE__*/function () {
 
                 var _e28 = _this32.thumbnails[0].urlPrefix,
                     _s8 = _e28 + t,
-                    _n5 = new Image();
+                    _n4 = new Image();
 
-                _n5.src = _s8, _n5.onload = function () {
+                _n4.src = _s8, _n4.onload = function () {
                   _this32.player.debug.log("Preloaded thumb filename: ".concat(t)), _this32.loadedImages.includes(t) || _this32.loadedImages.push(t), i();
                 };
               }
@@ -11939,20 +12050,21 @@ var PreviewThumbnails = /*#__PURE__*/function () {
     }), _defineProperty$1(this, "determineContainerAutoSizing", function () {
       (_this32.elements.thumb.imageContainer.clientHeight > 20 || _this32.elements.thumb.imageContainer.clientWidth > 20) && (_this32.sizeSpecifiedInCSS = !0);
     }), _defineProperty$1(this, "setThumbContainerSizeAndPos", function () {
+      var e = _this32.elements.thumb.imageContainer;
+
       if (_this32.sizeSpecifiedInCSS) {
-        if (_this32.elements.thumb.imageContainer.clientHeight > 20 && _this32.elements.thumb.imageContainer.clientWidth < 20) {
-          var _e29 = Math.floor(_this32.elements.thumb.imageContainer.clientHeight * _this32.thumbAspectRatio);
+        if (e.clientHeight > 20 && e.clientWidth < 20) {
+          var t = Math.floor(e.clientHeight * _this32.thumbAspectRatio);
+          e.style.width = "".concat(t, "px");
+        } else if (e.clientHeight < 20 && e.clientWidth > 20) {
+          var _t19 = Math.floor(e.clientWidth / _this32.thumbAspectRatio);
 
-          _this32.elements.thumb.imageContainer.style.width = "".concat(_e29, "px");
-        } else if (_this32.elements.thumb.imageContainer.clientHeight < 20 && _this32.elements.thumb.imageContainer.clientWidth > 20) {
-          var _e30 = Math.floor(_this32.elements.thumb.imageContainer.clientWidth / _this32.thumbAspectRatio);
-
-          _this32.elements.thumb.imageContainer.style.height = "".concat(_e30, "px");
+          e.style.height = "".concat(_t19, "px");
         }
       } else {
-        var _e31 = Math.floor(_this32.thumbContainerHeight * _this32.thumbAspectRatio);
+        var _t20 = Math.floor(_this32.thumbContainerHeight * _this32.thumbAspectRatio);
 
-        _this32.elements.thumb.imageContainer.style.height = "".concat(_this32.thumbContainerHeight, "px"), _this32.elements.thumb.imageContainer.style.width = "".concat(_e31, "px");
+        e.style.height = "".concat(_this32.thumbContainerHeight, "px"), e.style.width = "".concat(_t20, "px");
       }
 
       _this32.setThumbContainerPos();
@@ -11961,10 +12073,11 @@ var PreviewThumbnails = /*#__PURE__*/function () {
           t = _this32.player.elements.container.getBoundingClientRect(),
           i = _this32.elements.thumb.container,
           s = t.left - e.left + 10,
-          n = t.right - e.left - i.clientWidth - 10;
+          n = t.right - e.left - i.clientWidth - 10,
+          r = _this32.mousePosX - e.left - i.clientWidth / 2,
+          a = clamp(r, s, n);
 
-      var r = _this32.mousePosX - e.left - i.clientWidth / 2;
-      r < s && (r = s), r > n && (r = n), i.style.left = "".concat(r, "px");
+      i.style.left = "".concat(a, "px"), i.style.setProperty("--preview-arrow-offset", r - a + "px");
     }), _defineProperty$1(this, "setScrubbingContainerSize", function () {
       var _fitRatio = fitRatio(_this32.thumbAspectRatio, {
         width: _this32.player.media.clientWidth,
@@ -12050,11 +12163,11 @@ var source = {
 
       var t = e.sources,
           i = e.type,
-          _t20 = _slicedToArray(t, 1),
-          _t20$ = _t20[0],
-          _t20$$provider = _t20$.provider,
-          s = _t20$$provider === void 0 ? providers.html5 : _t20$$provider,
-          n = _t20$.src,
+          _t21 = _slicedToArray(t, 1),
+          _t21$ = _t21[0],
+          _t21$$provider = _t21$.provider,
+          s = _t21$$provider === void 0 ? providers.html5 : _t21$$provider,
+          n = _t21$.src,
           r = "html5" === s ? i : "div",
           a = "html5" === s ? {} : {
         src: n
@@ -12069,13 +12182,6 @@ var source = {
     }, !0)) : this.debug.warn("Invalid source format");
   }
 };
-
-function clamp() {
-  var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-  var t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  var i = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 255;
-  return Math.min(Math.max(e, t), i);
-}
 
 var Plyr = /*#__PURE__*/function () {
   function Plyr(e, t) {
@@ -12110,14 +12216,14 @@ var Plyr = /*#__PURE__*/function () {
       support.airplay && _this35.media.webkitShowPlaybackTargetPicker();
     }), _defineProperty$1(this, "toggleControls", function (e) {
       if (_this35.supported.ui && !_this35.isAudio) {
-        var _t21 = hasClass(_this35.elements.container, _this35.config.classNames.hideControls),
-            _i10 = void 0 === e ? void 0 : !e,
-            _s9 = toggleClass(_this35.elements.container, _this35.config.classNames.hideControls, _i10);
+        var _t22 = hasClass(_this35.elements.container, _this35.config.classNames.hideControls),
+            _i9 = void 0 === e ? void 0 : !e,
+            _s9 = toggleClass(_this35.elements.container, _this35.config.classNames.hideControls, _i9);
 
-        if (_s9 && is.array(_this35.config.controls) && _this35.config.controls.includes("settings") && !is.empty(_this35.config.settings) && controls.toggleMenu.call(_this35, !1), _s9 !== _t21) {
-          var _e32 = _s9 ? "controlshidden" : "controlsshown";
+        if (_s9 && is.array(_this35.config.controls) && _this35.config.controls.includes("settings") && !is.empty(_this35.config.settings) && controls.toggleMenu.call(_this35, !1), _s9 !== _t22) {
+          var _e29 = _s9 ? "controlshidden" : "controlsshown";
 
-          triggerEvent.call(_this35, _this35.media, _e32);
+          triggerEvent.call(_this35, _this35.media, _e29);
         }
 
         return !_s9;
@@ -12186,8 +12292,8 @@ var Plyr = /*#__PURE__*/function () {
       case "div":
         if (n = this.media.querySelector("iframe"), is.element(n)) {
           if (r = parseUrl(n.getAttribute("src")), this.provider = getProviderByUrl(r.toString()), this.elements.container = this.media, this.media = n, this.elements.container.className = "", r.search.length) {
-            var _e33 = ["1", "true"];
-            _e33.includes(r.searchParams.get("autoplay")) && (this.config.autoplay = !0), _e33.includes(r.searchParams.get("loop")) && (this.config.loop.active = !0), this.isYouTube ? (this.config.playsinline = _e33.includes(r.searchParams.get("playsinline")), this.config.youtube.hl = r.searchParams.get("hl")) : this.config.playsinline = !0;
+            var _e30 = ["1", "true"];
+            _e30.includes(r.searchParams.get("autoplay")) && (this.config.autoplay = !0), _e30.includes(r.searchParams.get("loop")) && (this.config.loop.active = !0), this.isYouTube ? (this.config.playsinline = _e30.includes(r.searchParams.get("playsinline")), this.config.youtube.hl = r.searchParams.get("hl")) : this.config.playsinline = !0;
           }
         } else this.provider = this.media.getAttribute(this.config.attributes.embed.provider), this.media.removeAttribute(this.config.attributes.embed.provider);
 
@@ -12217,6 +12323,11 @@ var Plyr = /*#__PURE__*/function () {
     key: "toggleCaptions",
     value: function toggleCaptions(e) {
       captions.toggle.call(this, e, !1);
+    }
+  }, {
+    key: "setPreviewThumbnails",
+    value: function setPreviewThumbnails(e) {
+      this.previewThumbnails && this.previewThumbnails.loaded && (this.previewThumbnails.destroy(), this.previewThumbnails = null), Object.assign(this.config.previewThumbnails, e), this.config.previewThumbnails.enabled && (this.previewThumbnails = new PreviewThumbnails(this));
     }
   }, {
     key: "isHTML5",
@@ -12332,7 +12443,7 @@ var Plyr = /*#__PURE__*/function () {
       var i = this.minimumSpeed,
           s = this.maximumSpeed;
       t = clamp(t, i, s), this.config.speed.selected = t, setTimeout(function () {
-        _this36.media.playbackRate = t;
+        _this36.media && (_this36.media.playbackRate = t);
       }, 0);
     },
     get: function get() {
@@ -12358,9 +12469,9 @@ var Plyr = /*#__PURE__*/function () {
           n = !0;
 
       if (!i.includes(s)) {
-        var _e34 = closest(i, s);
+        var _e31 = closest(i, s);
 
-        this.debug.warn("Unsupported quality option: ".concat(s, ", using ").concat(_e34, " instead")), s = _e34, n = !1;
+        this.debug.warn("Unsupported quality option: ".concat(s, ", using ").concat(_e31, " instead")), s = _e31, n = !1;
       }
 
       t.selected = s, this.media.quality = s, n && this.storage.set({
@@ -12417,8 +12528,7 @@ var Plyr = /*#__PURE__*/function () {
   }, {
     key: "autoplay",
     set: function set(e) {
-      var t = is.boolean(e) ? e : this.config.autoplay;
-      this.config.autoplay = t;
+      this.config.autoplay = is.boolean(e) ? e : this.config.autoplay;
     },
     get: function get() {
       return Boolean(this.config.autoplay);
@@ -12426,7 +12536,7 @@ var Plyr = /*#__PURE__*/function () {
   }, {
     key: "currentTrack",
     set: function set(e) {
-      captions.set.call(this, e, !1);
+      captions.set.call(this, e, !1), captions.setup.call(this);
     },
     get: function get() {
       var _this$captions2 = this.captions,

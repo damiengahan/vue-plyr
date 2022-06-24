@@ -3376,27 +3376,7 @@ _export$1({
     O.length = len - actualDeleteCount + insertCount;
     return A;
   }
-});var FUNCTION_NAME_EXISTS = functionName.EXISTS;
-var defineProperty$9 = objectDefineProperty$1.f;
-var FunctionPrototype$4 = Function.prototype;
-var functionToString$2 = functionUncurryThis(FunctionPrototype$4.toString);
-var nameRE$1 = /function\b(?:\s|\/\*[\S\s]*?\*\/|\/\/[^\n\r]*[\n\r]+)*([^\s(/]*)/;
-var regExpExec = functionUncurryThis(nameRE$1.exec);
-var NAME$1 = 'name'; // Function instances `.name` property
-// https://tc39.es/ecma262/#sec-function-instances-name
-
-if (descriptors$1 && !FUNCTION_NAME_EXISTS) {
-  defineProperty$9(FunctionPrototype$4, NAME$1, {
-    configurable: true,
-    get: function () {
-      try {
-        return regExpExec(nameRE$1, functionToString$2(this))[1];
-      } catch (error) {
-        return '';
-      }
-    }
-  });
-}// https://tc39.es/ecma262/#sec-globalthis
+});// https://tc39.es/ecma262/#sec-globalthis
 
 _export$1({
   global: true
@@ -3490,7 +3470,7 @@ var stringTrim = {
   trim: createMethod$5(3)
 };var getOwnPropertyNames = objectGetOwnPropertyNames$1.f;
 var getOwnPropertyDescriptor$4 = objectGetOwnPropertyDescriptor$1.f;
-var defineProperty$a = objectDefineProperty$1.f;
+var defineProperty$9 = objectDefineProperty$1.f;
 var trim = stringTrim.trim;
 var NUMBER = 'Number';
 var NativeNumber = global_1$1[NUMBER];
@@ -3573,7 +3553,7 @@ if (isForced_1$1(NUMBER, !NativeNumber(' 0o1') || !NativeNumber('0b1') || Native
   'EPSILON,MAX_SAFE_INTEGER,MIN_SAFE_INTEGER,isFinite,isInteger,isNaN,isSafeInteger,parseFloat,parseInt,' + // ESNext
   'fromString,range').split(','), j = 0, key; keys$2.length > j; j++) {
     if (hasOwnProperty_1(NativeNumber, key = keys$2[j]) && !hasOwnProperty_1(NumberWrapper, key)) {
-      defineProperty$a(NumberWrapper, key, getOwnPropertyDescriptor$4(NativeNumber, key));
+      defineProperty$9(NumberWrapper, key, getOwnPropertyDescriptor$4(NativeNumber, key));
     }
   }
 
@@ -3822,58 +3802,7 @@ _export$1({
 
     return result;
   }
-});var getOwnPropertyNames$1 = objectGetOwnPropertyNamesExternal$1.f; // eslint-disable-next-line es-x/no-object-getownpropertynames -- required for testing
-
-var FAILS_ON_PRIMITIVES$3 = fails$1(function () {
-  return !Object.getOwnPropertyNames(1);
-}); // `Object.getOwnPropertyNames` method
-// https://tc39.es/ecma262/#sec-object.getownpropertynames
-
-_export$1({
-  target: 'Object',
-  stat: true,
-  forced: FAILS_ON_PRIMITIVES$3
-}, {
-  getOwnPropertyNames: getOwnPropertyNames$1
-});var correctPrototypeGetter = !fails$1(function () {
-  function F() {
-    /* empty */
-  }
-
-  F.prototype.constructor = null; // eslint-disable-next-line es-x/no-object-getprototypeof -- required for testing
-
-  return Object.getPrototypeOf(new F()) !== F.prototype;
-});var IE_PROTO$2 = sharedKey$1('IE_PROTO');
-var $Object$4 = Object;
-var ObjectPrototype$2 = $Object$4.prototype; // `Object.getPrototypeOf` method
-// https://tc39.es/ecma262/#sec-object.getprototypeof
-// eslint-disable-next-line es-x/no-object-getprototypeof -- safe
-
-var objectGetPrototypeOf = correctPrototypeGetter ? $Object$4.getPrototypeOf : function (O) {
-  var object = toObject$1(O);
-  if (hasOwnProperty_1(object, IE_PROTO$2)) return object[IE_PROTO$2];
-  var constructor = object.constructor;
-
-  if (isCallable(constructor) && object instanceof constructor) {
-    return constructor.prototype;
-  }
-
-  return object instanceof $Object$4 ? ObjectPrototype$2 : null;
-};var FAILS_ON_PRIMITIVES$4 = fails$1(function () {
-  objectGetPrototypeOf(1);
-}); // `Object.getPrototypeOf` method
-// https://tc39.es/ecma262/#sec-object.getprototypeof
-
-_export$1({
-  target: 'Object',
-  stat: true,
-  forced: FAILS_ON_PRIMITIVES$4,
-  sham: !correctPrototypeGetter
-}, {
-  getPrototypeOf: function getPrototypeOf(it) {
-    return objectGetPrototypeOf(toObject$1(it));
-  }
-});var FAILS_ON_PRIMITIVES$5 = fails$1(function () {
+});var FAILS_ON_PRIMITIVES$3 = fails$1(function () {
   objectKeys$1(1);
 }); // `Object.keys` method
 // https://tc39.es/ecma262/#sec-object.keys
@@ -3881,18 +3810,11 @@ _export$1({
 _export$1({
   target: 'Object',
   stat: true,
-  forced: FAILS_ON_PRIMITIVES$5
+  forced: FAILS_ON_PRIMITIVES$3
 }, {
   keys: function keys(it) {
     return objectKeys$1(toObject$1(it));
   }
-});// https://tc39.es/ecma262/#sec-object.setprototypeof
-
-_export$1({
-  target: 'Object',
-  stat: true
-}, {
-  setPrototypeOf: objectSetPrototypeOf
 });// https://tc39.es/ecma262/#sec-object.prototype.tostring
 
 
@@ -3961,10 +3883,10 @@ var regexpStickyHelpers = {
   BROKEN_CARET: BROKEN_CARET,
   MISSED_STICKY: MISSED_STICKY,
   UNSUPPORTED_Y: UNSUPPORTED_Y
-};var defineProperty$b = objectDefineProperty$1.f;
+};var defineProperty$a = objectDefineProperty$1.f;
 
 var proxyAccessor = function (Target, Source, key) {
-  key in Target || defineProperty$b(Target, key, {
+  key in Target || defineProperty$a(Target, key, {
     configurable: true,
     get: function () {
       return Source[key];
@@ -3995,7 +3917,7 @@ var regexpUnsupportedDotAll = fails$1(function () {
 var regexpUnsupportedNcg = fails$1(function () {
   var re = $RegExp$2('(?<a>b)', 'g');
   return re.exec('b').groups.a !== 'b' || 'b'.replace(re, '$<a>c') !== 'bc';
-});var getOwnPropertyNames$2 = objectGetOwnPropertyNames$1.f;
+});var getOwnPropertyNames$1 = objectGetOwnPropertyNames$1.f;
 var enforceInternalState = internalState$1.enforce;
 var MATCH$1 = wellKnownSymbol$1('match');
 var NativeRegExp = global_1$1.RegExp;
@@ -4168,7 +4090,7 @@ if (isForced_1$1('RegExp', BASE_FORCED)) {
     return result;
   };
 
-  for (var keys$3 = getOwnPropertyNames$2(NativeRegExp), index = 0; keys$3.length > index;) {
+  for (var keys$3 = getOwnPropertyNames$1(NativeRegExp), index = 0; keys$3.length > index;) {
     proxyAccessor(RegExpWrapper, NativeRegExp, keys$3[index++]);
   }
 
@@ -4299,64 +4221,10 @@ _export$1({
   forced: /./.exec !== regexpExec
 }, {
   exec: regexpExec
-});var defineBuiltInAccessor = function (target, name, descriptor) {
-  if (descriptor.get) makeBuiltIn_1(descriptor.get, name, {
-    getter: true
-  });
-  if (descriptor.set) makeBuiltIn_1(descriptor.set, name, {
-    setter: true
-  });
-  return objectDefineProperty$1.f(target, name, descriptor);
-};var RegExp$1 = global_1$1.RegExp;
-var RegExpPrototype$2 = RegExp$1.prototype;
-var FORCED$6 = descriptors$1 && fails$1(function () {
-  var INDICES_SUPPORT = true;
-
-  try {
-    RegExp$1('.', 'd');
-  } catch (error) {
-    INDICES_SUPPORT = false;
-  }
-
-  var O = {}; // modern V8 bug
-
-  var calls = '';
-  var expected = INDICES_SUPPORT ? 'dgimsy' : 'gimsy';
-
-  var addGetter = function (key, chr) {
-    // eslint-disable-next-line es-x/no-object-defineproperty -- safe
-    Object.defineProperty(O, key, {
-      get: function () {
-        calls += chr;
-        return true;
-      }
-    });
-  };
-
-  var pairs = {
-    dotAll: 's',
-    global: 'g',
-    ignoreCase: 'i',
-    multiline: 'm',
-    sticky: 'y'
-  };
-  if (INDICES_SUPPORT) pairs.hasIndices = 'd';
-
-  for (var key in pairs) addGetter(key, pairs[key]); // eslint-disable-next-line es-x/no-object-getownpropertydescriptor -- safe
-
-
-  var result = Object.getOwnPropertyDescriptor(RegExpPrototype$2, 'flags').get.call(O);
-  return result !== expected || calls !== expected;
-}); // `RegExp.prototype.flags` getter
-// https://tc39.es/ecma262/#sec-get-regexp.prototype.flags
-
-if (FORCED$6) defineBuiltInAccessor(RegExpPrototype$2, 'flags', {
-  configurable: true,
-  get: regexpFlags
 });var PROPER_FUNCTION_NAME = functionName.PROPER;
 var TO_STRING = 'toString';
-var RegExpPrototype$3 = RegExp.prototype;
-var n$ToString = RegExpPrototype$3[TO_STRING];
+var RegExpPrototype$2 = RegExp.prototype;
+var n$ToString = RegExpPrototype$2[TO_STRING];
 var NOT_GENERIC = fails$1(function () {
   return n$ToString.call({
     source: 'a',
@@ -4437,6 +4305,30 @@ var stringMultibyte = {
   // `String.prototype.at` method
   // https://github.com/mathiasbynens/String.prototype.at
   charAt: createMethod$7(true)
+};var correctPrototypeGetter = !fails$1(function () {
+  function F() {
+    /* empty */
+  }
+
+  F.prototype.constructor = null; // eslint-disable-next-line es-x/no-object-getprototypeof -- required for testing
+
+  return Object.getPrototypeOf(new F()) !== F.prototype;
+});var IE_PROTO$2 = sharedKey$1('IE_PROTO');
+var $Object$4 = Object;
+var ObjectPrototype$2 = $Object$4.prototype; // `Object.getPrototypeOf` method
+// https://tc39.es/ecma262/#sec-object.getprototypeof
+// eslint-disable-next-line es-x/no-object-getprototypeof -- safe
+
+var objectGetPrototypeOf = correctPrototypeGetter ? $Object$4.getPrototypeOf : function (O) {
+  var object = toObject$1(O);
+  if (hasOwnProperty_1(object, IE_PROTO$2)) return object[IE_PROTO$2];
+  var constructor = object.constructor;
+
+  if (isCallable(constructor) && object instanceof constructor) {
+    return constructor.prototype;
+  }
+
+  return object instanceof $Object$4 ? ObjectPrototype$2 : null;
 };var ITERATOR$3 = wellKnownSymbol$1('iterator');
 var BUGGY_SAFARI_ITERATORS = false; // `%IteratorPrototype%` object
 // https://tc39.es/ecma262/#sec-%iteratorprototype%-object
@@ -4620,7 +4512,7 @@ defineIterator(String, 'String', function (iterated) {
     done: false
   };
 });var SPECIES$6 = wellKnownSymbol$1('species');
-var RegExpPrototype$4 = RegExp.prototype;
+var RegExpPrototype$3 = RegExp.prototype;
 
 var fixRegexpWellKnownSymbolLogic = function (KEY, exec, FORCED, SHAM) {
   var SYMBOL = wellKnownSymbol$1(KEY);
@@ -4671,7 +4563,7 @@ var fixRegexpWellKnownSymbolLogic = function (KEY, exec, FORCED, SHAM) {
       var uncurriedNativeMethod = functionUncurryThis(nativeMethod);
       var $exec = regexp.exec;
 
-      if ($exec === regexpExec || $exec === RegExpPrototype$4.exec) {
+      if ($exec === regexpExec || $exec === RegExpPrototype$3.exec) {
         if (DELEGATES_TO_SYMBOL && !forceStringMethod) {
           // The native String method already delegates to @@method (this
           // polyfilled function), leasing to infinite recursion.
@@ -4693,10 +4585,10 @@ var fixRegexpWellKnownSymbolLogic = function (KEY, exec, FORCED, SHAM) {
       };
     });
     defineBuiltIn(String.prototype, KEY, methods[0]);
-    defineBuiltIn(RegExpPrototype$4, SYMBOL, methods[1]);
+    defineBuiltIn(RegExpPrototype$3, SYMBOL, methods[1]);
   }
 
-  if (SHAM) createNonEnumerableProperty$1(RegExpPrototype$4[SYMBOL], 'sham', true);
+  if (SHAM) createNonEnumerableProperty$1(RegExpPrototype$3[SYMBOL], 'sham', true);
 };var charAt$5 = stringMultibyte.charAt; // `AdvanceStringIndex` abstract operation
 // https://tc39.es/ecma262/#sec-advancestringindex
 
@@ -5138,12 +5030,12 @@ _export$1({
     });
   }
 });var $isExtensible = Object.isExtensible;
-var FAILS_ON_PRIMITIVES$6 = fails$1(function () {
+var FAILS_ON_PRIMITIVES$4 = fails$1(function () {
   $isExtensible(1);
 }); // `Object.isExtensible` method
 // https://tc39.es/ecma262/#sec-object.isextensible
 
-var objectIsExtensible = FAILS_ON_PRIMITIVES$6 || arrayBufferNonExtensible ? function isExtensible(it) {
+var objectIsExtensible = FAILS_ON_PRIMITIVES$4 || arrayBufferNonExtensible ? function isExtensible(it) {
   if (!isObject$1(it)) return false;
   if (arrayBufferNonExtensible && classofRaw$1(it) == 'ArrayBuffer') return false;
   return $isExtensible ? $isExtensible(it) : true;
@@ -5630,7 +5522,7 @@ for (var COLLECTION_NAME$1 in domIterables$1) {
   }
 }
 
-handlePrototype(domTokenListPrototype);var defineProperty$c = objectDefineProperty$1.f;
+handlePrototype(domTokenListPrototype);var defineProperty$b = objectDefineProperty$1.f;
 var ARRAY_ITERATOR = 'Array Iterator';
 var setInternalState$4 = internalState$1.set;
 var getInternalState$4 = internalState$1.getterFor(ARRAY_ITERATOR); // `Array.prototype.entries` method
@@ -5692,7 +5584,7 @@ addToUnscopables('values');
 addToUnscopables('entries'); // V8 ~ Chrome 45- bug
 
 if ( descriptors$1 && values.name !== 'values') try {
-  defineProperty$c(values, 'name', {
+  defineProperty$b(values, 'name', {
     value: 'values'
   });
 } catch (error) {
@@ -5746,9 +5638,17 @@ var nativeUrl = !fails$1(function () {
   || new URL('http://a#б').hash !== '#%D0%B1' // fails in Chrome 66-
   || result !== 'a1c3' // throws in Safari
   || new URL('http://x', undefined).host !== 'x';
-});var $assign = Object.assign; // eslint-disable-next-line es-x/no-object-defineproperty -- required for testing
+});var defineBuiltInAccessor = function (target, name, descriptor) {
+  if (descriptor.get) makeBuiltIn_1(descriptor.get, name, {
+    getter: true
+  });
+  if (descriptor.set) makeBuiltIn_1(descriptor.set, name, {
+    setter: true
+  });
+  return objectDefineProperty$1.f(target, name, descriptor);
+};var $assign = Object.assign; // eslint-disable-next-line es-x/no-object-defineproperty -- required for testing
 
-var defineProperty$d = Object.defineProperty;
+var defineProperty$c = Object.defineProperty;
 var concat$2 = functionUncurryThis([].concat); // `Object.assign` method
 // https://tc39.es/ecma262/#sec-object.assign
 
@@ -5756,10 +5656,10 @@ var objectAssign = !$assign || fails$1(function () {
   // should have correct order of operations (Edge bug)
   if (descriptors$1 && $assign({
     b: 1
-  }, $assign(defineProperty$d({}, 'a', {
+  }, $assign(defineProperty$c({}, 'a', {
     enumerable: true,
     get: function () {
-      defineProperty$d(this, 'b', {
+      defineProperty$c(this, 'b', {
         value: 3,
         enumerable: false
       });
@@ -6062,7 +5962,7 @@ var NativeRequest = safeGetBuiltIn('Request');
 var Headers = safeGetBuiltIn('Headers');
 var RequestPrototype = NativeRequest && NativeRequest.prototype;
 var HeadersPrototype = Headers && Headers.prototype;
-var RegExp$2 = global_1$1.RegExp;
+var RegExp$1 = global_1$1.RegExp;
 var TypeError$4 = global_1$1.TypeError;
 var decodeURIComponent$1 = global_1$1.decodeURIComponent;
 var encodeURIComponent$1 = global_1$1.encodeURIComponent;
@@ -6078,7 +5978,7 @@ var plus = /\+/g;
 var sequences = Array(4);
 
 var percentSequence = function (bytes) {
-  return sequences[bytes - 1] || (sequences[bytes - 1] = RegExp$2('((?:%[\\da-f]{2}){' + bytes + '})', 'gi'));
+  return sequences[bytes - 1] || (sequences[bytes - 1] = RegExp$1('((?:%[\\da-f]{2}){' + bytes + '})', 'gi'));
 };
 
 var percentDecode = function (sequence) {
@@ -7554,17 +7454,6 @@ _export$1({
   sham: !descriptors$1
 }, {
   URL: URLConstructor
-});// https://url.spec.whatwg.org/#dom-url-tojson
-
-
-_export$1({
-  target: 'URL',
-  proto: true,
-  enumerable: true
-}, {
-  toJSON: function toJSON() {
-    return functionCall(URL.prototype.toString, this);
-  }
 });var $indexOf = arrayIncludes.indexOf;
 var nativeIndexOf = [].indexOf;
 var NEGATIVE_ZERO$2 = !!nativeIndexOf && 1 / [1].indexOf(1, -0) < 0;
@@ -7626,7 +7515,7 @@ _export({
   return arr2;
 }function _arrayWithoutHoles(arr) {
   if (Array.isArray(arr)) return _arrayLikeToArray(arr);
-}var defineProperty$e = objectDefineProperty.f;
+}var defineProperty$d = objectDefineProperty.f;
 var NativeSymbol$1 = global_1.Symbol;
 
 if (descriptors && typeof NativeSymbol$1 == 'function' && (!('description' in NativeSymbol$1.prototype) || // Safari 12 bug
@@ -7647,7 +7536,7 @@ NativeSymbol$1().description !== undefined)) {
   var symbolToString$1 = symbolPrototype.toString;
   var native = String(NativeSymbol$1('test')) == 'Symbol(test)';
   var regexp$1 = /^Symbol\((.*)\)[^)]+$/;
-  defineProperty$e(symbolPrototype, 'description', {
+  defineProperty$d(symbolPrototype, 'description', {
     configurable: true,
     get: function description() {
       var symbol = isObject(this) ? this.valueOf() : this;
@@ -8219,8 +8108,8 @@ var regexpFlags$1 = function () {
   if (that.sticky) result += 'y';
   return result;
 };var TO_STRING$1 = 'toString';
-var RegExpPrototype$5 = RegExp.prototype;
-var nativeToString = RegExpPrototype$5[TO_STRING$1];
+var RegExpPrototype$4 = RegExp.prototype;
+var nativeToString = RegExpPrototype$4[TO_STRING$1];
 var NOT_GENERIC$1 = fails(function () {
   return nativeToString.call({
     source: 'a',
@@ -8236,7 +8125,7 @@ if (NOT_GENERIC$1 || INCORRECT_NAME$1) {
     var R = anObject(this);
     var p = String(R.source);
     var rf = R.flags;
-    var f = String(rf === undefined && R instanceof RegExp && !('flags' in RegExpPrototype$5) ? regexpFlags$1.call(R) : rf);
+    var f = String(rf === undefined && R instanceof RegExp && !('flags' in RegExpPrototype$4) ? regexpFlags$1.call(R) : rf);
     return '/' + p + '/' + f;
   }, {
     unsafe: true
@@ -8374,3359 +8263,6 @@ function createCommonjsModule$1(fn, module) {
     exports: {}
   }, fn(module, module.exports), module.exports;
 }
-
-var check$2 = function check(it) {
-  return it && it.Math == Math && it;
-}; // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-
-
-var global_1$2 = // eslint-disable-next-line es/no-global-this -- safe
-check$2((typeof globalThis === "undefined" ? "undefined" : _typeof(globalThis)) == 'object' && globalThis) || check$2((typeof window === "undefined" ? "undefined" : _typeof(window)) == 'object' && window) || // eslint-disable-next-line no-restricted-globals -- safe
-check$2((typeof self === "undefined" ? "undefined" : _typeof(self)) == 'object' && self) || check$2(_typeof(commonjsGlobal$1) == 'object' && commonjsGlobal$1) || // eslint-disable-next-line no-new-func -- fallback
-function () {
-  return this;
-}() || Function('return this')();
-
-var fails$2 = function fails(exec) {
-  try {
-    return !!exec();
-  } catch (error) {
-    return true;
-  }
-}; // Detect IE8's incomplete defineProperty implementation
-
-
-var descriptors$2 = !fails$2(function () {
-  // eslint-disable-next-line es/no-object-defineproperty -- required for testing
-  return Object.defineProperty({}, 1, {
-    get: function get() {
-      return 7;
-    }
-  })[1] != 7;
-});
-var $propertyIsEnumerable$4 = {}.propertyIsEnumerable; // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
-
-var getOwnPropertyDescriptor$1$1 = Object.getOwnPropertyDescriptor; // Nashorn ~ JDK8 bug
-
-var NASHORN_BUG$2 = getOwnPropertyDescriptor$1$1 && !$propertyIsEnumerable$4.call({
-  1: 2
-}, 1); // `Object.prototype.propertyIsEnumerable` method implementation
-// https://tc39.es/ecma262/#sec-object.prototype.propertyisenumerable
-
-var f$4$1 = NASHORN_BUG$2 ? function propertyIsEnumerable(V) {
-  var descriptor = getOwnPropertyDescriptor$1$1(this, V);
-  return !!descriptor && descriptor.enumerable;
-} : $propertyIsEnumerable$4;
-var objectPropertyIsEnumerable$2 = {
-  f: f$4$1
-};
-
-var createPropertyDescriptor$2 = function createPropertyDescriptor(bitmap, value) {
-  return {
-    enumerable: !(bitmap & 1),
-    configurable: !(bitmap & 2),
-    writable: !(bitmap & 4),
-    value: value
-  };
-};
-
-var toString$4 = {}.toString;
-
-var classofRaw$2 = function classofRaw(it) {
-  return toString$4.call(it).slice(8, -1);
-};
-
-var split$5 = ''.split; // fallback for non-array-like ES3 and non-enumerable old V8 strings
-
-var indexedObject$2 = fails$2(function () {
-  // throws an error in rhino, see https://github.com/mozilla/rhino/issues/346
-  // eslint-disable-next-line no-prototype-builtins -- safe
-  return !Object('z').propertyIsEnumerable(0);
-}) ? function (it) {
-  return classofRaw$2(it) == 'String' ? split$5.call(it, '') : Object(it);
-} : Object; // `RequireObjectCoercible` abstract operation
-// https://tc39.es/ecma262/#sec-requireobjectcoercible
-
-var requireObjectCoercible$2 = function requireObjectCoercible(it) {
-  if (it == undefined) throw TypeError("Can't call method on " + it);
-  return it;
-}; // toObject with fallback for non-array-like ES3 strings
-
-
-var toIndexedObject$2 = function toIndexedObject(it) {
-  return indexedObject$2(requireObjectCoercible$2(it));
-};
-
-var isObject$2 = function isObject$2(it) {
-  return _typeof(it) === 'object' ? it !== null : typeof it === 'function';
-}; // `ToPrimitive` abstract operation
-// https://tc39.es/ecma262/#sec-toprimitive
-// instead of the ES6 spec version, we didn't implement @@toPrimitive case
-// and the second argument - flag - preferred type is a string
-
-
-var toPrimitive$2 = function toPrimitive(input, PREFERRED_STRING) {
-  if (!isObject$2(input)) return input;
-  var fn, val;
-  if (PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject$2(val = fn.call(input))) return val;
-  if (typeof (fn = input.valueOf) == 'function' && !isObject$2(val = fn.call(input))) return val;
-  if (!PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject$2(val = fn.call(input))) return val;
-  throw TypeError("Can't convert object to primitive value");
-};
-
-var hasOwnProperty$2 = {}.hasOwnProperty;
-
-var has$1$1 = function has$1(it, key) {
-  return hasOwnProperty$2.call(it, key);
-};
-
-var document$1$1 = global_1$2.document; // typeof document.createElement is 'object' in old IE
-
-var EXISTS$3 = isObject$2(document$1$1) && isObject$2(document$1$1.createElement);
-
-var documentCreateElement$2 = function documentCreateElement(it) {
-  return EXISTS$3 ? document$1$1.createElement(it) : {};
-}; // Thank's IE8 for his funny defineProperty
-
-
-var ie8DomDefine$2 = !descriptors$2 && !fails$2(function () {
-  // eslint-disable-next-line es/no-object-defineproperty -- requied for testing
-  return Object.defineProperty(documentCreateElement$2('div'), 'a', {
-    get: function get() {
-      return 7;
-    }
-  }).a != 7;
-}); // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
-
-var $getOwnPropertyDescriptor$4 = Object.getOwnPropertyDescriptor; // `Object.getOwnPropertyDescriptor` method
-// https://tc39.es/ecma262/#sec-object.getownpropertydescriptor
-
-var f$3$1 = descriptors$2 ? $getOwnPropertyDescriptor$4 : function getOwnPropertyDescriptor(O, P) {
-  O = toIndexedObject$2(O);
-  P = toPrimitive$2(P, true);
-  if (ie8DomDefine$2) try {
-    return $getOwnPropertyDescriptor$4(O, P);
-  } catch (error) {
-    /* empty */
-  }
-  if (has$1$1(O, P)) return createPropertyDescriptor$2(!objectPropertyIsEnumerable$2.f.call(O, P), O[P]);
-};
-var objectGetOwnPropertyDescriptor$2 = {
-  f: f$3$1
-};
-
-var anObject$2 = function anObject(it) {
-  if (!isObject$2(it)) {
-    throw TypeError(String(it) + ' is not an object');
-  }
-
-  return it;
-}; // eslint-disable-next-line es/no-object-defineproperty -- safe
-
-
-var $defineProperty$3 = Object.defineProperty; // `Object.defineProperty` method
-// https://tc39.es/ecma262/#sec-object.defineproperty
-
-var f$2$1 = descriptors$2 ? $defineProperty$3 : function defineProperty(O, P, Attributes) {
-  anObject$2(O);
-  P = toPrimitive$2(P, true);
-  anObject$2(Attributes);
-  if (ie8DomDefine$2) try {
-    return $defineProperty$3(O, P, Attributes);
-  } catch (error) {
-    /* empty */
-  }
-  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported');
-  if ('value' in Attributes) O[P] = Attributes.value;
-  return O;
-};
-var objectDefineProperty$2 = {
-  f: f$2$1
-};
-var createNonEnumerableProperty$2 = descriptors$2 ? function (object, key, value) {
-  return objectDefineProperty$2.f(object, key, createPropertyDescriptor$2(1, value));
-} : function (object, key, value) {
-  object[key] = value;
-  return object;
-};
-
-var setGlobal$1 = function setGlobal(key, value) {
-  try {
-    createNonEnumerableProperty$2(global_1$2, key, value);
-  } catch (error) {
-    global_1$2[key] = value;
-  }
-
-  return value;
-};
-
-var SHARED$2 = '__core-js_shared__';
-var store$1$1 = global_1$2[SHARED$2] || setGlobal$1(SHARED$2, {});
-var sharedStore$2 = store$1$1;
-var functionToString$3 = Function.toString; // this helper broken in `3.4.1-3.4.4`, so we can't use `shared` helper
-
-if (typeof sharedStore$2.inspectSource != 'function') {
-  sharedStore$2.inspectSource = function (it) {
-    return functionToString$3.call(it);
-  };
-}
-
-var inspectSource$2 = sharedStore$2.inspectSource;
-var WeakMap$2$1 = global_1$2.WeakMap;
-var nativeWeakMap$2 = typeof WeakMap$2$1 === 'function' && /native code/.test(inspectSource$2(WeakMap$2$1));
-var isPure$1 = false;
-var shared$2 = createCommonjsModule$1(function (module) {
-  (module.exports = function (key, value) {
-    return sharedStore$2[key] || (sharedStore$2[key] = value !== undefined ? value : {});
-  })('versions', []).push({
-    version: '3.10.1',
-    mode: 'global',
-    copyright: '© 2021 Denis Pushkarev (zloirock.ru)'
-  });
-});
-var id$3 = 0;
-var postfix$2 = Math.random();
-
-var uid$2 = function uid(key) {
-  return 'Symbol(' + String(key === undefined ? '' : key) + ')_' + (++id$3 + postfix$2).toString(36);
-};
-
-var keys$4 = shared$2('keys');
-
-var sharedKey$2 = function sharedKey(key) {
-  return keys$4[key] || (keys$4[key] = uid$2(key));
-};
-
-var hiddenKeys$1$1 = {};
-var WeakMap$1$1 = global_1$2.WeakMap;
-var set$2, get$2, has$3;
-
-var enforce$2 = function enforce(it) {
-  return has$3(it) ? get$2(it) : set$2(it, {});
-};
-
-var getterFor$2 = function getterFor(TYPE) {
-  return function (it) {
-    var state;
-
-    if (!isObject$2(it) || (state = get$2(it)).type !== TYPE) {
-      throw TypeError('Incompatible receiver, ' + TYPE + ' required');
-    }
-
-    return state;
-  };
-};
-
-if (nativeWeakMap$2) {
-  var store$4 = sharedStore$2.state || (sharedStore$2.state = new WeakMap$1$1());
-  var wmget$2 = store$4.get;
-  var wmhas$2 = store$4.has;
-  var wmset$2 = store$4.set;
-
-  set$2 = function set(it, metadata) {
-    metadata.facade = it;
-    wmset$2.call(store$4, it, metadata);
-    return metadata;
-  };
-
-  get$2 = function get(it) {
-    return wmget$2.call(store$4, it) || {};
-  };
-
-  has$3 = function has(it) {
-    return wmhas$2.call(store$4, it);
-  };
-} else {
-  var STATE$2 = sharedKey$2('state');
-  hiddenKeys$1$1[STATE$2] = true;
-
-  set$2 = function set(it, metadata) {
-    metadata.facade = it;
-    createNonEnumerableProperty$2(it, STATE$2, metadata);
-    return metadata;
-  };
-
-  get$2 = function get(it) {
-    return has$1$1(it, STATE$2) ? it[STATE$2] : {};
-  };
-
-  has$3 = function has(it) {
-    return has$1$1(it, STATE$2);
-  };
-}
-
-var internalState$2 = {
-  set: set$2,
-  get: get$2,
-  has: has$3,
-  enforce: enforce$2,
-  getterFor: getterFor$2
-};
-var redefine$1 = createCommonjsModule$1(function (module) {
-  var getInternalState = internalState$2.get;
-  var enforceInternalState = internalState$2.enforce;
-  var TEMPLATE = String(String).split('String');
-  (module.exports = function (O, key, value, options) {
-    var unsafe = options ? !!options.unsafe : false;
-    var simple = options ? !!options.enumerable : false;
-    var noTargetGet = options ? !!options.noTargetGet : false;
-    var state;
-
-    if (typeof value == 'function') {
-      if (typeof key == 'string' && !has$1$1(value, 'name')) {
-        createNonEnumerableProperty$2(value, 'name', key);
-      }
-
-      state = enforceInternalState(value);
-
-      if (!state.source) {
-        state.source = TEMPLATE.join(typeof key == 'string' ? key : '');
-      }
-    }
-
-    if (O === global_1$2) {
-      if (simple) O[key] = value;else setGlobal$1(key, value);
-      return;
-    } else if (!unsafe) {
-      delete O[key];
-    } else if (!noTargetGet && O[key]) {
-      simple = true;
-    }
-
-    if (simple) O[key] = value;else createNonEnumerableProperty$2(O, key, value); // add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
-  })(Function.prototype, 'toString', function toString() {
-    return typeof this == 'function' && getInternalState(this).source || inspectSource$2(this);
-  });
-});
-var path$2 = global_1$2;
-
-var aFunction$1$1 = function aFunction$1(variable) {
-  return typeof variable == 'function' ? variable : undefined;
-};
-
-var getBuiltIn$2 = function getBuiltIn(namespace, method) {
-  return arguments.length < 2 ? aFunction$1$1(path$2[namespace]) || aFunction$1$1(global_1$2[namespace]) : path$2[namespace] && path$2[namespace][method] || global_1$2[namespace] && global_1$2[namespace][method];
-};
-
-var ceil$2 = Math.ceil;
-var floor$3$1 = Math.floor; // `ToInteger` abstract operation
-// https://tc39.es/ecma262/#sec-tointeger
-
-var toInteger$1 = function toInteger(argument) {
-  return isNaN(argument = +argument) ? 0 : (argument > 0 ? floor$3$1 : ceil$2)(argument);
-};
-
-var min$2$1 = Math.min; // `ToLength` abstract operation
-// https://tc39.es/ecma262/#sec-tolength
-
-var toLength$2 = function toLength(argument) {
-  return argument > 0 ? min$2$1(toInteger$1(argument), 0x1FFFFFFFFFFFFF) : 0; // 2 ** 53 - 1 == 9007199254740991
-};
-
-var max$1$1 = Math.max;
-var min$1$1 = Math.min; // Helper for a popular repeating case of the spec:
-// Let integer be ? ToInteger(index).
-// If integer < 0, let result be max((length + integer), 0); else let result be min(integer, length).
-
-var toAbsoluteIndex$2 = function toAbsoluteIndex(index, length) {
-  var integer = toInteger$1(index);
-  return integer < 0 ? max$1$1(integer + length, 0) : min$1$1(integer, length);
-}; // `Array.prototype.{ indexOf, includes }` methods implementation
-
-
-var createMethod$1$1 = function createMethod$1(IS_INCLUDES) {
-  return function ($this, el, fromIndex) {
-    var O = toIndexedObject$2($this);
-    var length = toLength$2(O.length);
-    var index = toAbsoluteIndex$2(fromIndex, length);
-    var value; // Array#includes uses SameValueZero equality algorithm
-    // eslint-disable-next-line no-self-compare -- NaN check
-
-    if (IS_INCLUDES && el != el) while (length > index) {
-      value = O[index++]; // eslint-disable-next-line no-self-compare -- NaN check
-
-      if (value != value) return true; // Array#indexOf ignores holes, Array#includes - not
-    } else for (; length > index; index++) {
-      if ((IS_INCLUDES || index in O) && O[index] === el) return IS_INCLUDES || index || 0;
-    }
-    return !IS_INCLUDES && -1;
-  };
-};
-
-var arrayIncludes$2 = {
-  // `Array.prototype.includes` method
-  // https://tc39.es/ecma262/#sec-array.prototype.includes
-  includes: createMethod$1$1(true),
-  // `Array.prototype.indexOf` method
-  // https://tc39.es/ecma262/#sec-array.prototype.indexof
-  indexOf: createMethod$1$1(false)
-};
-var indexOf$3 = arrayIncludes$2.indexOf;
-
-var objectKeysInternal$2 = function objectKeysInternal(object, names) {
-  var O = toIndexedObject$2(object);
-  var i = 0;
-  var result = [];
-  var key;
-
-  for (key in O) {
-    !has$1$1(hiddenKeys$1$1, key) && has$1$1(O, key) && result.push(key);
-  } // Don't enum bug & hidden keys
-
-
-  while (names.length > i) {
-    if (has$1$1(O, key = names[i++])) {
-      ~indexOf$3(result, key) || result.push(key);
-    }
-  }
-
-  return result;
-}; // IE8- don't enum bug keys
-
-
-var enumBugKeys$2 = ['constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', 'toString', 'valueOf'];
-var hiddenKeys$4 = enumBugKeys$2.concat('length', 'prototype'); // `Object.getOwnPropertyNames` method
-// https://tc39.es/ecma262/#sec-object.getownpropertynames
-// eslint-disable-next-line es/no-object-getownpropertynames -- safe
-
-var f$1$1 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
-  return objectKeysInternal$2(O, hiddenKeys$4);
-};
-
-var objectGetOwnPropertyNames$2 = {
-  f: f$1$1
-}; // eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
-
-var f$f = Object.getOwnPropertySymbols;
-var objectGetOwnPropertySymbols$2 = {
-  f: f$f
-}; // all object keys, includes non-enumerable and symbols
-
-var ownKeys$1$1 = getBuiltIn$2('Reflect', 'ownKeys') || function ownKeys(it) {
-  var keys = objectGetOwnPropertyNames$2.f(anObject$2(it));
-  var getOwnPropertySymbols = objectGetOwnPropertySymbols$2.f;
-  return getOwnPropertySymbols ? keys.concat(getOwnPropertySymbols(it)) : keys;
-};
-
-var copyConstructorProperties$2 = function copyConstructorProperties(target, source) {
-  var keys = ownKeys$1$1(source);
-  var defineProperty = objectDefineProperty$2.f;
-  var getOwnPropertyDescriptor = objectGetOwnPropertyDescriptor$2.f;
-
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
-    if (!has$1$1(target, key)) defineProperty(target, key, getOwnPropertyDescriptor(source, key));
-  }
-};
-
-var replacement$2 = /#|\.prototype\./;
-
-var isForced$2 = function isForced(feature, detection) {
-  var value = data$2[normalize$2(feature)];
-  return value == POLYFILL$2 ? true : value == NATIVE$2 ? false : typeof detection == 'function' ? fails$2(detection) : !!detection;
-};
-
-var normalize$2 = isForced$2.normalize = function (string) {
-  return String(string).replace(replacement$2, '.').toLowerCase();
-};
-
-var data$2 = isForced$2.data = {};
-var NATIVE$2 = isForced$2.NATIVE = 'N';
-var POLYFILL$2 = isForced$2.POLYFILL = 'P';
-var isForced_1$2 = isForced$2;
-var getOwnPropertyDescriptor$7 = objectGetOwnPropertyDescriptor$2.f;
-/*
-  options.target      - name of the target object
-  options.global      - target is the global object
-  options.stat        - export as static methods of target
-  options.proto       - export as prototype methods of target
-  options.real        - real prototype method for the `pure` version
-  options.forced      - export even if the native feature is available
-  options.bind        - bind methods to the target, required for the `pure` version
-  options.wrap        - wrap constructors to preventing global pollution, required for the `pure` version
-  options.unsafe      - use the simple assignment of property instead of delete + defineProperty
-  options.sham        - add a flag to not completely full polyfills
-  options.enumerable  - export as enumerable property
-  options.noTargetGet - prevent calling a getter on target
-*/
-
-var _export$2 = function _export(options, source) {
-  var TARGET = options.target;
-  var GLOBAL = options.global;
-  var STATIC = options.stat;
-  var FORCED, target, key, targetProperty, sourceProperty, descriptor;
-
-  if (GLOBAL) {
-    target = global_1$2;
-  } else if (STATIC) {
-    target = global_1$2[TARGET] || setGlobal$1(TARGET, {});
-  } else {
-    target = (global_1$2[TARGET] || {}).prototype;
-  }
-
-  if (target) for (key in source) {
-    sourceProperty = source[key];
-
-    if (options.noTargetGet) {
-      descriptor = getOwnPropertyDescriptor$7(target, key);
-      targetProperty = descriptor && descriptor.value;
-    } else targetProperty = target[key];
-
-    FORCED = isForced_1$2(GLOBAL ? key : TARGET + (STATIC ? '.' : '#') + key, options.forced); // contained in target
-
-    if (!FORCED && targetProperty !== undefined) {
-      if (_typeof(sourceProperty) === _typeof(targetProperty)) continue;
-      copyConstructorProperties$2(sourceProperty, targetProperty);
-    } // add a flag to not completely full polyfills
-
-
-    if (options.sham || targetProperty && targetProperty.sham) {
-      createNonEnumerableProperty$2(sourceProperty, 'sham', true);
-    } // extend global
-
-
-    redefine$1(target, key, sourceProperty, options);
-  }
-}; // `RegExp.prototype.flags` getter implementation
-// https://tc39.es/ecma262/#sec-get-regexp.prototype.flags
-
-
-var regexpFlags$2 = function regexpFlags() {
-  var that = anObject$2(this);
-  var result = '';
-  if (that.global) result += 'g';
-  if (that.ignoreCase) result += 'i';
-  if (that.multiline) result += 'm';
-  if (that.dotAll) result += 's';
-  if (that.unicode) result += 'u';
-  if (that.sticky) result += 'y';
-  return result;
-}; // babel-minify transpiles RegExp('a', 'y') -> /a/y and it causes SyntaxError,
-// so we use an intermediate function.
-
-
-function RE(s, f) {
-  return RegExp(s, f);
-}
-
-var UNSUPPORTED_Y$1$1 = fails$2(function () {
-  // babel-minify transpiles RegExp('a', 'y') -> /a/y and it causes SyntaxError
-  var re = RE('a', 'y');
-  re.lastIndex = 2;
-  return re.exec('abcd') != null;
-});
-var BROKEN_CARET$1 = fails$2(function () {
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=773687
-  var re = RE('^r', 'gy');
-  re.lastIndex = 2;
-  return re.exec('str') != null;
-});
-var regexpStickyHelpers$1 = {
-  UNSUPPORTED_Y: UNSUPPORTED_Y$1$1,
-  BROKEN_CARET: BROKEN_CARET$1
-};
-var nativeExec$1 = RegExp.prototype.exec;
-var nativeReplace$1 = shared$2('native-string-replace', String.prototype.replace);
-var patchedExec$1 = nativeExec$1;
-
-var UPDATES_LAST_INDEX_WRONG$1 = function () {
-  var re1 = /a/;
-  var re2 = /b*/g;
-  nativeExec$1.call(re1, 'a');
-  nativeExec$1.call(re2, 'a');
-  return re1.lastIndex !== 0 || re2.lastIndex !== 0;
-}();
-
-var UNSUPPORTED_Y$4 = regexpStickyHelpers$1.UNSUPPORTED_Y || regexpStickyHelpers$1.BROKEN_CARET; // nonparticipating capturing group, copied from es5-shim's String#split patch.
-// eslint-disable-next-line regexp/no-assertion-capturing-group, regexp/no-empty-group -- required for testing
-
-var NPCG_INCLUDED$1 = /()??/.exec('')[1] !== undefined;
-var PATCH$1 = UPDATES_LAST_INDEX_WRONG$1 || NPCG_INCLUDED$1 || UNSUPPORTED_Y$4;
-
-if (PATCH$1) {
-  patchedExec$1 = function exec(str) {
-    var re = this;
-    var lastIndex, reCopy, match, i;
-    var sticky = UNSUPPORTED_Y$4 && re.sticky;
-    var flags = regexpFlags$2.call(re);
-    var source = re.source;
-    var charsAdded = 0;
-    var strCopy = str;
-
-    if (sticky) {
-      flags = flags.replace('y', '');
-
-      if (flags.indexOf('g') === -1) {
-        flags += 'g';
-      }
-
-      strCopy = String(str).slice(re.lastIndex); // Support anchored sticky behavior.
-
-      if (re.lastIndex > 0 && (!re.multiline || re.multiline && str[re.lastIndex - 1] !== '\n')) {
-        source = '(?: ' + source + ')';
-        strCopy = ' ' + strCopy;
-        charsAdded++;
-      } // ^(? + rx + ) is needed, in combination with some str slicing, to
-      // simulate the 'y' flag.
-
-
-      reCopy = new RegExp('^(?:' + source + ')', flags);
-    }
-
-    if (NPCG_INCLUDED$1) {
-      reCopy = new RegExp('^' + source + '$(?!\\s)', flags);
-    }
-
-    if (UPDATES_LAST_INDEX_WRONG$1) lastIndex = re.lastIndex;
-    match = nativeExec$1.call(sticky ? reCopy : re, strCopy);
-
-    if (sticky) {
-      if (match) {
-        match.input = match.input.slice(charsAdded);
-        match[0] = match[0].slice(charsAdded);
-        match.index = re.lastIndex;
-        re.lastIndex += match[0].length;
-      } else re.lastIndex = 0;
-    } else if (UPDATES_LAST_INDEX_WRONG$1 && match) {
-      re.lastIndex = re.global ? match.index + match[0].length : lastIndex;
-    }
-
-    if (NPCG_INCLUDED$1 && match && match.length > 1) {
-      // Fix browsers whose `exec` methods don't consistently return `undefined`
-      // for NPCG, like IE8. NOTE: This doesn' work for /(.?)?/
-      nativeReplace$1.call(match[0], reCopy, function () {
-        for (i = 1; i < arguments.length - 2; i++) {
-          if (arguments[i] === undefined) match[i] = undefined;
-        }
-      });
-    }
-
-    return match;
-  };
-}
-
-var regexpExec$1 = patchedExec$1; // `RegExp.prototype.exec` method
-// https://tc39.es/ecma262/#sec-regexp.prototype.exec
-
-_export$2({
-  target: 'RegExp',
-  proto: true,
-  forced: /./.exec !== regexpExec$1
-}, {
-  exec: regexpExec$1
-});
-
-var engineIsNode$1 = classofRaw$2(global_1$2.process) == 'process';
-var engineUserAgent$2 = getBuiltIn$2('navigator', 'userAgent') || '';
-var process$2 = global_1$2.process;
-var versions$2 = process$2 && process$2.versions;
-var v8$2 = versions$2 && versions$2.v8;
-var match$2, version$2;
-
-if (v8$2) {
-  match$2 = v8$2.split('.');
-  version$2 = match$2[0] + match$2[1];
-} else if (engineUserAgent$2) {
-  match$2 = engineUserAgent$2.match(/Edge\/(\d+)/);
-
-  if (!match$2 || match$2[1] >= 74) {
-    match$2 = engineUserAgent$2.match(/Chrome\/(\d+)/);
-    if (match$2) version$2 = match$2[1];
-  }
-}
-
-var engineV8Version$2 = version$2 && +version$2; // eslint-disable-next-line es/no-object-getownpropertysymbols -- required for testing
-
-var nativeSymbol$2 = !!Object.getOwnPropertySymbols && !fails$2(function () {
-  // eslint-disable-next-line es/no-symbol -- required for testing
-  return !Symbol.sham && ( // Chrome 38 Symbol has incorrect toString conversion
-  // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
-  engineIsNode$1 ? engineV8Version$2 === 38 : engineV8Version$2 > 37 && engineV8Version$2 < 41);
-});
-/* eslint-disable es/no-symbol -- required for testing */
-
-var useSymbolAsUid$2 = nativeSymbol$2 && !Symbol.sham && _typeof(Symbol.iterator) == 'symbol';
-var WellKnownSymbolsStore$4 = shared$2('wks');
-var Symbol$1$1 = global_1$2.Symbol;
-var createWellKnownSymbol$2 = useSymbolAsUid$2 ? Symbol$1$1 : Symbol$1$1 && Symbol$1$1.withoutSetter || uid$2;
-
-var wellKnownSymbol$2 = function wellKnownSymbol(name) {
-  if (!has$1$1(WellKnownSymbolsStore$4, name) || !(nativeSymbol$2 || typeof WellKnownSymbolsStore$4[name] == 'string')) {
-    if (nativeSymbol$2 && has$1$1(Symbol$1$1, name)) {
-      WellKnownSymbolsStore$4[name] = Symbol$1$1[name];
-    } else {
-      WellKnownSymbolsStore$4[name] = createWellKnownSymbol$2('Symbol.' + name);
-    }
-  }
-
-  return WellKnownSymbolsStore$4[name];
-}; // TODO: Remove from `core-js@4` since it's moved to entry points
-
-
-var SPECIES$9 = wellKnownSymbol$2('species');
-var REPLACE_SUPPORTS_NAMED_GROUPS$1 = !fails$2(function () {
-  // #replace needs built-in support for named groups.
-  // #match works fine because it just return the exec results, even if it has
-  // a "grops" property.
-  var re = /./;
-
-  re.exec = function () {
-    var result = [];
-    result.groups = {
-      a: '7'
-    };
-    return result;
-  };
-
-  return ''.replace(re, '$<a>') !== '7';
-}); // IE <= 11 replaces $0 with the whole match, as if it was $&
-// https://stackoverflow.com/questions/6024666/getting-ie-to-replace-a-regex-with-the-literal-string-0
-
-var REPLACE_KEEPS_$0$1 = function () {
-  // eslint-disable-next-line regexp/prefer-escape-replacement-dollar-char -- required for testing
-  return 'a'.replace(/./, '$0') === '$0';
-}();
-
-var REPLACE$1 = wellKnownSymbol$2('replace'); // Safari <= 13.0.3(?) substitutes nth capture where n>m with an empty string
-
-var REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE$1 = function () {
-  if (/./[REPLACE$1]) {
-    return /./[REPLACE$1]('a', '$0') === '';
-  }
-
-  return false;
-}(); // Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
-// Weex JS has frozen built-in prototypes, so use try / catch wrapper
-
-
-var SPLIT_WORKS_WITH_OVERWRITTEN_EXEC$1 = !fails$2(function () {
-  // eslint-disable-next-line regexp/no-empty-group -- required for testing
-  var re = /(?:)/;
-  var originalExec = re.exec;
-
-  re.exec = function () {
-    return originalExec.apply(this, arguments);
-  };
-
-  var result = 'ab'.split(re);
-  return result.length !== 2 || result[0] !== 'a' || result[1] !== 'b';
-});
-
-var fixRegexpWellKnownSymbolLogic$1 = function fixRegexpWellKnownSymbolLogic(KEY, length, exec, sham) {
-  var SYMBOL = wellKnownSymbol$2(KEY);
-  var DELEGATES_TO_SYMBOL = !fails$2(function () {
-    // String methods call symbol-named RegEp methods
-    var O = {};
-
-    O[SYMBOL] = function () {
-      return 7;
-    };
-
-    return ''[KEY](O) != 7;
-  });
-  var DELEGATES_TO_EXEC = DELEGATES_TO_SYMBOL && !fails$2(function () {
-    // Symbol-named RegExp methods call .exec
-    var execCalled = false;
-    var re = /a/;
-
-    if (KEY === 'split') {
-      // We can't use real regex here since it causes deoptimization
-      // and serious performance degradation in V8
-      // https://github.com/zloirock/core-js/issues/306
-      re = {}; // RegExp[@@split] doesn't call the regex's exec method, but first creates
-      // a new one. We need to return the patched regex when creating the new one.
-
-      re.constructor = {};
-
-      re.constructor[SPECIES$9] = function () {
-        return re;
-      };
-
-      re.flags = '';
-      re[SYMBOL] = /./[SYMBOL];
-    }
-
-    re.exec = function () {
-      execCalled = true;
-      return null;
-    };
-
-    re[SYMBOL]('');
-    return !execCalled;
-  });
-
-  if (!DELEGATES_TO_SYMBOL || !DELEGATES_TO_EXEC || KEY === 'replace' && !(REPLACE_SUPPORTS_NAMED_GROUPS$1 && REPLACE_KEEPS_$0$1 && !REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE$1) || KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC$1) {
-    var nativeRegExpMethod = /./[SYMBOL];
-    var methods = exec(SYMBOL, ''[KEY], function (nativeMethod, regexp, str, arg2, forceStringMethod) {
-      if (regexp.exec === RegExp.prototype.exec) {
-        if (DELEGATES_TO_SYMBOL && !forceStringMethod) {
-          // The native String method already delegates to @@method (this
-          // polyfilled function), leasing to infinite recursion.
-          // We avoid it by directly calling the native @@method method.
-          return {
-            done: true,
-            value: nativeRegExpMethod.call(regexp, str, arg2)
-          };
-        }
-
-        return {
-          done: true,
-          value: nativeMethod.call(str, regexp, arg2)
-        };
-      }
-
-      return {
-        done: false
-      };
-    }, {
-      REPLACE_KEEPS_$0: REPLACE_KEEPS_$0$1,
-      REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE: REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE$1
-    });
-    var stringMethod = methods[0];
-    var regexMethod = methods[1];
-    redefine$1(String.prototype, KEY, stringMethod);
-    redefine$1(RegExp.prototype, SYMBOL, length == 2 // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
-    // 21.2.5.11 RegExp.prototype[@@split](string, limit)
-    ? function (string, arg) {
-      return regexMethod.call(string, this, arg);
-    } // 21.2.5.6 RegExp.prototype[@@match](string)
-    // 21.2.5.9 RegExp.prototype[@@search](string)
-    : function (string) {
-      return regexMethod.call(string, this);
-    });
-  }
-
-  if (sham) createNonEnumerableProperty$2(RegExp.prototype[SYMBOL], 'sham', true);
-}; // `String.prototype.{ codePointAt, at }` methods implementation
-
-
-var createMethod$9 = function createMethod(CONVERT_TO_STRING) {
-  return function ($this, pos) {
-    var S = String(requireObjectCoercible$2($this));
-    var position = toInteger$1(pos);
-    var size = S.length;
-    var first, second;
-    if (position < 0 || position >= size) return CONVERT_TO_STRING ? '' : undefined;
-    first = S.charCodeAt(position);
-    return first < 0xD800 || first > 0xDBFF || position + 1 === size || (second = S.charCodeAt(position + 1)) < 0xDC00 || second > 0xDFFF ? CONVERT_TO_STRING ? S.charAt(position) : first : CONVERT_TO_STRING ? S.slice(position, position + 2) : (first - 0xD800 << 10) + (second - 0xDC00) + 0x10000;
-  };
-};
-
-var stringMultibyte$2 = {
-  // `String.prototype.codePointAt` method
-  // https://tc39.es/ecma262/#sec-string.prototype.codepointat
-  codeAt: createMethod$9(false),
-  // `String.prototype.at` method
-  // https://github.com/mathiasbynens/String.prototype.at
-  charAt: createMethod$9(true)
-};
-var charAt$1$1 = stringMultibyte$2.charAt; // `AdvanceStringIndex` abstract operation
-// https://tc39.es/ecma262/#sec-advancestringindex
-
-var advanceStringIndex$1 = function advanceStringIndex(S, index, unicode) {
-  return index + (unicode ? charAt$1$1(S, index).length : 1);
-}; // `ToObject` abstract operation
-// https://tc39.es/ecma262/#sec-toobject
-
-
-var toObject$2 = function toObject(argument) {
-  return Object(requireObjectCoercible$2(argument));
-};
-
-var floor$2$1 = Math.floor;
-var replace$1$1 = ''.replace;
-var SUBSTITUTION_SYMBOLS$1 = /\$([$&'`]|\d{1,2}|<[^>]*>)/g;
-var SUBSTITUTION_SYMBOLS_NO_NAMED$1 = /\$([$&'`]|\d{1,2})/g; // https://tc39.es/ecma262/#sec-getsubstitution
-
-var getSubstitution$1 = function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
-  var tailPos = position + matched.length;
-  var m = captures.length;
-  var symbols = SUBSTITUTION_SYMBOLS_NO_NAMED$1;
-
-  if (namedCaptures !== undefined) {
-    namedCaptures = toObject$2(namedCaptures);
-    symbols = SUBSTITUTION_SYMBOLS$1;
-  }
-
-  return replace$1$1.call(replacement, symbols, function (match, ch) {
-    var capture;
-
-    switch (ch.charAt(0)) {
-      case '$':
-        return '$';
-
-      case '&':
-        return matched;
-
-      case '`':
-        return str.slice(0, position);
-
-      case "'":
-        return str.slice(tailPos);
-
-      case '<':
-        capture = namedCaptures[ch.slice(1, -1)];
-        break;
-
-      default:
-        // \d\d?
-        var n = +ch;
-        if (n === 0) return match;
-
-        if (n > m) {
-          var f = floor$2$1(n / 10);
-          if (f === 0) return match;
-          if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
-          return match;
-        }
-
-        capture = captures[n - 1];
-    }
-
-    return capture === undefined ? '' : capture;
-  });
-}; // `RegExpExec` abstract operation
-// https://tc39.es/ecma262/#sec-regexpexec
-
-
-var regexpExecAbstract$1 = function regexpExecAbstract(R, S) {
-  var exec = R.exec;
-
-  if (typeof exec === 'function') {
-    var result = exec.call(R, S);
-
-    if (_typeof(result) !== 'object') {
-      throw TypeError('RegExp exec method returned something other than an Object or null');
-    }
-
-    return result;
-  }
-
-  if (classofRaw$2(R) !== 'RegExp') {
-    throw TypeError('RegExp#exec called on incompatible receiver');
-  }
-
-  return regexpExec$1.call(R, S);
-};
-
-var max$7 = Math.max;
-var min$9 = Math.min;
-
-var maybeToString$1 = function maybeToString(it) {
-  return it === undefined ? it : String(it);
-}; // @@replace logic
-
-
-fixRegexpWellKnownSymbolLogic$1('replace', 2, function (REPLACE, nativeReplace, maybeCallNative, reason) {
-  var REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE = reason.REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE;
-  var REPLACE_KEEPS_$0 = reason.REPLACE_KEEPS_$0;
-  var UNSAFE_SUBSTITUTE = REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE ? '$' : '$0';
-  return [// `String.prototype.replace` method
-  // https://tc39.es/ecma262/#sec-string.prototype.replace
-  function replace(searchValue, replaceValue) {
-    var O = requireObjectCoercible$2(this);
-    var replacer = searchValue == undefined ? undefined : searchValue[REPLACE];
-    return replacer !== undefined ? replacer.call(searchValue, O, replaceValue) : nativeReplace.call(String(O), searchValue, replaceValue);
-  }, // `RegExp.prototype[@@replace]` method
-  // https://tc39.es/ecma262/#sec-regexp.prototype-@@replace
-  function (regexp, replaceValue) {
-    if (!REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE && REPLACE_KEEPS_$0 || typeof replaceValue === 'string' && replaceValue.indexOf(UNSAFE_SUBSTITUTE) === -1) {
-      var res = maybeCallNative(nativeReplace, regexp, this, replaceValue);
-      if (res.done) return res.value;
-    }
-
-    var rx = anObject$2(regexp);
-    var S = String(this);
-    var functionalReplace = typeof replaceValue === 'function';
-    if (!functionalReplace) replaceValue = String(replaceValue);
-    var global = rx.global;
-
-    if (global) {
-      var fullUnicode = rx.unicode;
-      rx.lastIndex = 0;
-    }
-
-    var results = [];
-
-    while (true) {
-      var result = regexpExecAbstract$1(rx, S);
-      if (result === null) break;
-      results.push(result);
-      if (!global) break;
-      var matchStr = String(result[0]);
-      if (matchStr === '') rx.lastIndex = advanceStringIndex$1(S, toLength$2(rx.lastIndex), fullUnicode);
-    }
-
-    var accumulatedResult = '';
-    var nextSourcePosition = 0;
-
-    for (var i = 0; i < results.length; i++) {
-      result = results[i];
-      var matched = String(result[0]);
-      var position = max$7(min$9(toInteger$1(result.index), S.length), 0);
-      var captures = []; // NOTE: This is equivalent to
-      //   captures = result.slice(1).map(maybeToString)
-      // but for some reason `nativeSlice.call(result, 1, result.length)` (called in
-      // the slice polyfill when slicing native arrays) "doesn't work" in safari 9 and
-      // causes a crash (https://pastebin.com/N21QzeQA) when trying to debug it.
-
-      for (var j = 1; j < result.length; j++) {
-        captures.push(maybeToString$1(result[j]));
-      }
-
-      var namedCaptures = result.groups;
-
-      if (functionalReplace) {
-        var replacerArgs = [matched].concat(captures, position, S);
-        if (namedCaptures !== undefined) replacerArgs.push(namedCaptures);
-        var replacement = String(replaceValue.apply(undefined, replacerArgs));
-      } else {
-        replacement = getSubstitution$1(matched, S, position, captures, namedCaptures, replaceValue);
-      }
-
-      if (position >= nextSourcePosition) {
-        accumulatedResult += S.slice(nextSourcePosition, position) + replacement;
-        nextSourcePosition = position + matched.length;
-      }
-    }
-
-    return accumulatedResult + S.slice(nextSourcePosition);
-  }];
-});
-var correctPrototypeGetter$2 = !fails$2(function () {
-  function F() {
-    /* empty */
-  }
-
-  F.prototype.constructor = null; // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
-
-  return Object.getPrototypeOf(new F()) !== F.prototype;
-});
-var IE_PROTO$1$1 = sharedKey$2('IE_PROTO');
-var ObjectPrototype$4 = Object.prototype; // `Object.getPrototypeOf` method
-// https://tc39.es/ecma262/#sec-object.getprototypeof
-// eslint-disable-next-line es/no-object-getprototypeof -- safe
-
-var objectGetPrototypeOf$2 = correctPrototypeGetter$2 ? Object.getPrototypeOf : function (O) {
-  O = toObject$2(O);
-  if (has$1$1(O, IE_PROTO$1$1)) return O[IE_PROTO$1$1];
-
-  if (typeof O.constructor == 'function' && O instanceof O.constructor) {
-    return O.constructor.prototype;
-  }
-
-  return O instanceof Object ? ObjectPrototype$4 : null;
-};
-var ITERATOR$5$1 = wellKnownSymbol$2('iterator');
-var BUGGY_SAFARI_ITERATORS$1$1 = false;
-
-var returnThis$2$1 = function returnThis$2() {
-  return this;
-}; // `%IteratorPrototype%` object
-// https://tc39.es/ecma262/#sec-%iteratorprototype%-object
-
-
-var IteratorPrototype$2$1, PrototypeOfArrayIteratorPrototype$2, arrayIterator$2;
-/* eslint-disable es/no-array-prototype-keys -- safe */
-
-if ([].keys) {
-  arrayIterator$2 = [].keys(); // Safari 8 has buggy iterators w/o `next`
-
-  if (!('next' in arrayIterator$2)) BUGGY_SAFARI_ITERATORS$1$1 = true;else {
-    PrototypeOfArrayIteratorPrototype$2 = objectGetPrototypeOf$2(objectGetPrototypeOf$2(arrayIterator$2));
-    if (PrototypeOfArrayIteratorPrototype$2 !== Object.prototype) IteratorPrototype$2$1 = PrototypeOfArrayIteratorPrototype$2;
-  }
-}
-
-var NEW_ITERATOR_PROTOTYPE$1 = IteratorPrototype$2$1 == undefined || fails$2(function () {
-  var test = {}; // FF44- legacy iterators case
-
-  return IteratorPrototype$2$1[ITERATOR$5$1].call(test) !== test;
-});
-if (NEW_ITERATOR_PROTOTYPE$1) IteratorPrototype$2$1 = {}; // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-
-if (!has$1$1(IteratorPrototype$2$1, ITERATOR$5$1)) {
-  createNonEnumerableProperty$2(IteratorPrototype$2$1, ITERATOR$5$1, returnThis$2$1);
-}
-
-var iteratorsCore$2 = {
-  IteratorPrototype: IteratorPrototype$2$1,
-  BUGGY_SAFARI_ITERATORS: BUGGY_SAFARI_ITERATORS$1$1
-}; // `Object.keys` method
-// https://tc39.es/ecma262/#sec-object.keys
-// eslint-disable-next-line es/no-object-keys -- safe
-
-var objectKeys$2 = Object.keys || function keys(O) {
-  return objectKeysInternal$2(O, enumBugKeys$2);
-}; // `Object.defineProperties` method
-// https://tc39.es/ecma262/#sec-object.defineproperties
-// eslint-disable-next-line es/no-object-defineproperties -- safe
-
-
-var objectDefineProperties$2 = descriptors$2 ? Object.defineProperties : function defineProperties(O, Properties) {
-  anObject$2(O);
-  var keys = objectKeys$2(Properties);
-  var length = keys.length;
-  var index = 0;
-  var key;
-
-  while (length > index) {
-    objectDefineProperty$2.f(O, key = keys[index++], Properties[key]);
-  }
-
-  return O;
-};
-var html$2 = getBuiltIn$2('document', 'documentElement');
-var GT$2 = '>';
-var LT$2 = '<';
-var PROTOTYPE$4 = 'prototype';
-var SCRIPT$2 = 'script';
-var IE_PROTO$4 = sharedKey$2('IE_PROTO');
-
-var EmptyConstructor$2 = function EmptyConstructor() {
-  /* empty */
-};
-
-var scriptTag$2 = function scriptTag(content) {
-  return LT$2 + SCRIPT$2 + GT$2 + content + LT$2 + '/' + SCRIPT$2 + GT$2;
-}; // Create object with fake `null` prototype: use ActiveX Object with cleared prototype
-
-
-var NullProtoObjectViaActiveX$2 = function NullProtoObjectViaActiveX(activeXDocument) {
-  activeXDocument.write(scriptTag$2(''));
-  activeXDocument.close();
-  var temp = activeXDocument.parentWindow.Object;
-  activeXDocument = null; // avoid memory leak
-
-  return temp;
-}; // Create object with fake `null` prototype: use iframe Object with cleared prototype
-
-
-var NullProtoObjectViaIFrame$2 = function NullProtoObjectViaIFrame() {
-  // Thrash, waste and sodomy: IE GC bug
-  var iframe = documentCreateElement$2('iframe');
-  var JS = 'java' + SCRIPT$2 + ':';
-  var iframeDocument;
-  iframe.style.display = 'none';
-  html$2.appendChild(iframe); // https://github.com/zloirock/core-js/issues/475
-
-  iframe.src = String(JS);
-  iframeDocument = iframe.contentWindow.document;
-  iframeDocument.open();
-  iframeDocument.write(scriptTag$2('document.F=Object'));
-  iframeDocument.close();
-  return iframeDocument.F;
-}; // Check for document.domain and active x support
-// No need to use active x approach when document.domain is not set
-// see https://github.com/es-shims/es5-shim/issues/150
-// variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
-// avoid IE GC bug
-
-
-var activeXDocument$2;
-
-var _NullProtoObject = function NullProtoObject() {
-  try {
-    /* global ActiveXObject -- old IE */
-    activeXDocument$2 = document.domain && new ActiveXObject('htmlfile');
-  } catch (error) {
-    /* ignore */
-  }
-
-  _NullProtoObject = activeXDocument$2 ? NullProtoObjectViaActiveX$2(activeXDocument$2) : NullProtoObjectViaIFrame$2();
-  var length = enumBugKeys$2.length;
-
-  while (length--) {
-    delete _NullProtoObject[PROTOTYPE$4][enumBugKeys$2[length]];
-  }
-
-  return _NullProtoObject();
-};
-
-hiddenKeys$1$1[IE_PROTO$4] = true; // `Object.create` method
-// https://tc39.es/ecma262/#sec-object.create
-
-var objectCreate$2 = Object.create || function create(O, Properties) {
-  var result;
-
-  if (O !== null) {
-    EmptyConstructor$2[PROTOTYPE$4] = anObject$2(O);
-    result = new EmptyConstructor$2();
-    EmptyConstructor$2[PROTOTYPE$4] = null; // add "__proto__" for Object.getPrototypeOf polyfill
-
-    result[IE_PROTO$4] = O;
-  } else result = _NullProtoObject();
-
-  return Properties === undefined ? result : objectDefineProperties$2(result, Properties);
-};
-
-var defineProperty$1$1 = objectDefineProperty$2.f;
-var TO_STRING_TAG$2$1 = wellKnownSymbol$2('toStringTag');
-
-var setToStringTag$2 = function setToStringTag(it, TAG, STATIC) {
-  if (it && !has$1$1(it = STATIC ? it : it.prototype, TO_STRING_TAG$2$1)) {
-    defineProperty$1$1(it, TO_STRING_TAG$2$1, {
-      configurable: true,
-      value: TAG
-    });
-  }
-};
-
-var iterators$2 = {};
-var IteratorPrototype$1$1 = iteratorsCore$2.IteratorPrototype;
-
-var returnThis$1$1 = function returnThis$1() {
-  return this;
-};
-
-var createIteratorConstructor$2 = function createIteratorConstructor(IteratorConstructor, NAME, next) {
-  var TO_STRING_TAG = NAME + ' Iterator';
-  IteratorConstructor.prototype = objectCreate$2(IteratorPrototype$1$1, {
-    next: createPropertyDescriptor$2(1, next)
-  });
-  setToStringTag$2(IteratorConstructor, TO_STRING_TAG, false);
-  iterators$2[TO_STRING_TAG] = returnThis$1$1;
-  return IteratorConstructor;
-};
-
-var aPossiblePrototype$2 = function aPossiblePrototype(it) {
-  if (!isObject$2(it) && it !== null) {
-    throw TypeError("Can't set " + String(it) + ' as a prototype');
-  }
-
-  return it;
-};
-/* eslint-disable no-proto -- safe */
-// `Object.setPrototypeOf` method
-// https://tc39.es/ecma262/#sec-object.setprototypeof
-// Works with __proto__ only. Old v8 can't work with null proto objects.
-// eslint-disable-next-line es/no-object-setprototypeof -- safe
-
-
-var objectSetPrototypeOf$2 = Object.setPrototypeOf || ('__proto__' in {} ? function () {
-  var CORRECT_SETTER = false;
-  var test = {};
-  var setter;
-
-  try {
-    // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
-    setter = Object.getOwnPropertyDescriptor(Object.prototype, '__proto__').set;
-    setter.call(test, []);
-    CORRECT_SETTER = test instanceof Array;
-  } catch (error) {
-    /* empty */
-  }
-
-  return function setPrototypeOf(O, proto) {
-    anObject$2(O);
-    aPossiblePrototype$2(proto);
-    if (CORRECT_SETTER) setter.call(O, proto);else O.__proto__ = proto;
-    return O;
-  };
-}() : undefined);
-var IteratorPrototype$6 = iteratorsCore$2.IteratorPrototype;
-var BUGGY_SAFARI_ITERATORS$4 = iteratorsCore$2.BUGGY_SAFARI_ITERATORS;
-var ITERATOR$4$1 = wellKnownSymbol$2('iterator');
-var KEYS$2 = 'keys';
-var VALUES$2 = 'values';
-var ENTRIES$2 = 'entries';
-
-var returnThis$5 = function returnThis() {
-  return this;
-};
-
-var defineIterator$2 = function defineIterator(Iterable, NAME, IteratorConstructor, next, DEFAULT, IS_SET, FORCED) {
-  createIteratorConstructor$2(IteratorConstructor, NAME, next);
-
-  var getIterationMethod = function getIterationMethod(KIND) {
-    if (KIND === DEFAULT && defaultIterator) return defaultIterator;
-    if (!BUGGY_SAFARI_ITERATORS$4 && KIND in IterablePrototype) return IterablePrototype[KIND];
-
-    switch (KIND) {
-      case KEYS$2:
-        return function keys() {
-          return new IteratorConstructor(this, KIND);
-        };
-
-      case VALUES$2:
-        return function values() {
-          return new IteratorConstructor(this, KIND);
-        };
-
-      case ENTRIES$2:
-        return function entries() {
-          return new IteratorConstructor(this, KIND);
-        };
-    }
-
-    return function () {
-      return new IteratorConstructor(this);
-    };
-  };
-
-  var TO_STRING_TAG = NAME + ' Iterator';
-  var INCORRECT_VALUES_NAME = false;
-  var IterablePrototype = Iterable.prototype;
-  var nativeIterator = IterablePrototype[ITERATOR$4$1] || IterablePrototype['@@iterator'] || DEFAULT && IterablePrototype[DEFAULT];
-  var defaultIterator = !BUGGY_SAFARI_ITERATORS$4 && nativeIterator || getIterationMethod(DEFAULT);
-  var anyNativeIterator = NAME == 'Array' ? IterablePrototype.entries || nativeIterator : nativeIterator;
-  var CurrentIteratorPrototype, methods, KEY; // fix native
-
-  if (anyNativeIterator) {
-    CurrentIteratorPrototype = objectGetPrototypeOf$2(anyNativeIterator.call(new Iterable()));
-
-    if (IteratorPrototype$6 !== Object.prototype && CurrentIteratorPrototype.next) {
-      if (objectGetPrototypeOf$2(CurrentIteratorPrototype) !== IteratorPrototype$6) {
-        if (objectSetPrototypeOf$2) {
-          objectSetPrototypeOf$2(CurrentIteratorPrototype, IteratorPrototype$6);
-        } else if (typeof CurrentIteratorPrototype[ITERATOR$4$1] != 'function') {
-          createNonEnumerableProperty$2(CurrentIteratorPrototype, ITERATOR$4$1, returnThis$5);
-        }
-      } // Set @@toStringTag to native iterators
-
-
-      setToStringTag$2(CurrentIteratorPrototype, TO_STRING_TAG, true);
-    }
-  } // fix Array#{values, @@iterator}.name in V8 / FF
-
-
-  if (DEFAULT == VALUES$2 && nativeIterator && nativeIterator.name !== VALUES$2) {
-    INCORRECT_VALUES_NAME = true;
-
-    defaultIterator = function values() {
-      return nativeIterator.call(this);
-    };
-  } // define iterator
-
-
-  if (IterablePrototype[ITERATOR$4$1] !== defaultIterator) {
-    createNonEnumerableProperty$2(IterablePrototype, ITERATOR$4$1, defaultIterator);
-  }
-
-  iterators$2[NAME] = defaultIterator; // export additional methods
-
-  if (DEFAULT) {
-    methods = {
-      values: getIterationMethod(VALUES$2),
-      keys: IS_SET ? defaultIterator : getIterationMethod(KEYS$2),
-      entries: getIterationMethod(ENTRIES$2)
-    };
-    if (FORCED) for (KEY in methods) {
-      if (BUGGY_SAFARI_ITERATORS$4 || INCORRECT_VALUES_NAME || !(KEY in IterablePrototype)) {
-        redefine$1(IterablePrototype, KEY, methods[KEY]);
-      }
-    } else _export$2({
-      target: NAME,
-      proto: true,
-      forced: BUGGY_SAFARI_ITERATORS$4 || INCORRECT_VALUES_NAME
-    }, methods);
-  }
-
-  return methods;
-};
-
-var charAt$a = stringMultibyte$2.charAt;
-var STRING_ITERATOR$2 = 'String Iterator';
-var setInternalState$3$1 = internalState$2.set;
-var getInternalState$1$1 = internalState$2.getterFor(STRING_ITERATOR$2); // `String.prototype[@@iterator]` method
-// https://tc39.es/ecma262/#sec-string.prototype-@@iterator
-
-defineIterator$2(String, 'String', function (iterated) {
-  setInternalState$3$1(this, {
-    type: STRING_ITERATOR$2,
-    string: String(iterated),
-    index: 0
-  }); // `%StringIteratorPrototype%.next` method
-  // https://tc39.es/ecma262/#sec-%stringiteratorprototype%.next
-}, function next() {
-  var state = getInternalState$1$1(this);
-  var string = state.string;
-  var index = state.index;
-  var point;
-  if (index >= string.length) return {
-    value: undefined,
-    done: true
-  };
-  point = charAt$a(string, index);
-  state.index += point.length;
-  return {
-    value: point,
-    done: false
-  };
-});
-var ITERATOR$3$1 = wellKnownSymbol$2('iterator');
-var nativeUrl$1 = !fails$2(function () {
-  var url = new URL('b?a=1&b=2&c=3', 'http://a');
-  var searchParams = url.searchParams;
-  var result = '';
-  url.pathname = 'c%20d';
-  searchParams.forEach(function (value, key) {
-    searchParams['delete']('b');
-    result += key + value;
-  });
-  return isPure$1 && !url.toJSON || !searchParams.sort || url.href !== 'http://a/c%20d?a=1&c=3' || searchParams.get('c') !== '3' || String(new URLSearchParams('?a=1')) !== 'a=1' || !searchParams[ITERATOR$3$1] // throws in Edge
-  || new URL('https://a@b').username !== 'a' || new URLSearchParams(new URLSearchParams('a=b')).get('a') !== 'b' // not punycoded in Edge
-  || new URL('http://тест').host !== 'xn--e1aybc' // not escaped in Chrome 62-
-  || new URL('http://a#б').hash !== '#%D0%B1' // fails in Chrome 66-
-  || result !== 'a1c3' // throws in Safari
-  || new URL('http://x', undefined).host !== 'x';
-});
-
-var anInstance$1 = function anInstance(it, Constructor, name) {
-  if (!(it instanceof Constructor)) {
-    throw TypeError('Incorrect ' + (name ? name + ' ' : '') + 'invocation');
-  }
-
-  return it;
-}; // eslint-disable-next-line es/no-object-assign -- safe
-
-
-var $assign$1 = Object.assign; // eslint-disable-next-line es/no-object-defineproperty -- required for testing
-
-var defineProperty$f = Object.defineProperty; // `Object.assign` method
-// https://tc39.es/ecma262/#sec-object.assign
-
-var objectAssign$1 = !$assign$1 || fails$2(function () {
-  // should have correct order of operations (Edge bug)
-  if (descriptors$2 && $assign$1({
-    b: 1
-  }, $assign$1(defineProperty$f({}, 'a', {
-    enumerable: true,
-    get: function get() {
-      defineProperty$f(this, 'b', {
-        value: 3,
-        enumerable: false
-      });
-    }
-  }), {
-    b: 2
-  })).b !== 1) return true; // should work with symbols and should have deterministic property order (V8 bug)
-
-  var A = {};
-  var B = {}; // eslint-disable-next-line es/no-symbol -- safe
-
-  var symbol = Symbol();
-  var alphabet = 'abcdefghijklmnopqrst';
-  A[symbol] = 7;
-  alphabet.split('').forEach(function (chr) {
-    B[chr] = chr;
-  });
-  return $assign$1({}, A)[symbol] != 7 || objectKeys$2($assign$1({}, B)).join('') != alphabet;
-}) ? function assign(target, source) {
-  // eslint-disable-line no-unused-vars -- required for `.length`
-  var T = toObject$2(target);
-  var argumentsLength = arguments.length;
-  var index = 1;
-  var getOwnPropertySymbols = objectGetOwnPropertySymbols$2.f;
-  var propertyIsEnumerable = objectPropertyIsEnumerable$2.f;
-
-  while (argumentsLength > index) {
-    var S = indexedObject$2(arguments[index++]);
-    var keys = getOwnPropertySymbols ? objectKeys$2(S).concat(getOwnPropertySymbols(S)) : objectKeys$2(S);
-    var length = keys.length;
-    var j = 0;
-    var key;
-
-    while (length > j) {
-      key = keys[j++];
-      if (!descriptors$2 || propertyIsEnumerable.call(S, key)) T[key] = S[key];
-    }
-  }
-
-  return T;
-} : $assign$1;
-
-var aFunction$3 = function aFunction(it) {
-  if (typeof it != 'function') {
-    throw TypeError(String(it) + ' is not a function');
-  }
-
-  return it;
-}; // optional / simple context binding
-
-
-var functionBindContext$2 = function functionBindContext(fn, that, length) {
-  aFunction$3(fn);
-  if (that === undefined) return fn;
-
-  switch (length) {
-    case 0:
-      return function () {
-        return fn.call(that);
-      };
-
-    case 1:
-      return function (a) {
-        return fn.call(that, a);
-      };
-
-    case 2:
-      return function (a, b) {
-        return fn.call(that, a, b);
-      };
-
-    case 3:
-      return function (a, b, c) {
-        return fn.call(that, a, b, c);
-      };
-  }
-
-  return function ()
-  /* ...args */
-  {
-    return fn.apply(that, arguments);
-  };
-};
-
-var iteratorClose$1 = function iteratorClose(iterator) {
-  var returnMethod = iterator['return'];
-
-  if (returnMethod !== undefined) {
-    return anObject$2(returnMethod.call(iterator)).value;
-  }
-}; // call something on iterator step with safe closing on error
-
-
-var callWithSafeIterationClosing$2 = function callWithSafeIterationClosing(iterator, fn, value, ENTRIES) {
-  try {
-    return ENTRIES ? fn(anObject$2(value)[0], value[1]) : fn(value); // 7.4.6 IteratorClose(iterator, completion)
-  } catch (error) {
-    iteratorClose$1(iterator);
-    throw error;
-  }
-};
-
-var ITERATOR$2$1 = wellKnownSymbol$2('iterator');
-var ArrayPrototype$1$1 = Array.prototype; // check on default Array iterator
-
-var isArrayIteratorMethod$2 = function isArrayIteratorMethod(it) {
-  return it !== undefined && (iterators$2.Array === it || ArrayPrototype$1$1[ITERATOR$2$1] === it);
-};
-
-var createProperty$2 = function createProperty(object, key, value) {
-  var propertyKey = toPrimitive$2(key);
-  if (propertyKey in object) objectDefineProperty$2.f(object, propertyKey, createPropertyDescriptor$2(0, value));else object[propertyKey] = value;
-};
-
-var TO_STRING_TAG$1$1 = wellKnownSymbol$2('toStringTag');
-var test$2 = {};
-test$2[TO_STRING_TAG$1$1] = 'z';
-var toStringTagSupport$2 = String(test$2) === '[object z]';
-var TO_STRING_TAG$8 = wellKnownSymbol$2('toStringTag'); // ES3 wrong here
-
-var CORRECT_ARGUMENTS$2 = classofRaw$2(function () {
-  return arguments;
-}()) == 'Arguments'; // fallback for IE11 Script Access Denied error
-
-var tryGet$2 = function tryGet(it, key) {
-  try {
-    return it[key];
-  } catch (error) {
-    /* empty */
-  }
-}; // getting tag from ES6+ `Object.prototype.toString`
-
-
-var classof$2 = toStringTagSupport$2 ? classofRaw$2 : function (it) {
-  var O, tag, result;
-  return it === undefined ? 'Undefined' : it === null ? 'Null' // @@toStringTag case
-  : typeof (tag = tryGet$2(O = Object(it), TO_STRING_TAG$8)) == 'string' ? tag // builtinTag case
-  : CORRECT_ARGUMENTS$2 ? classofRaw$2(O) // ES3 arguments fallback
-  : (result = classofRaw$2(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : result;
-};
-var ITERATOR$1$1 = wellKnownSymbol$2('iterator');
-
-var getIteratorMethod$2 = function getIteratorMethod(it) {
-  if (it != undefined) return it[ITERATOR$1$1] || it['@@iterator'] || iterators$2[classof$2(it)];
-}; // `Array.from` method implementation
-// https://tc39.es/ecma262/#sec-array.from
-
-
-var arrayFrom$2 = function from(arrayLike
-/* , mapfn = undefined, thisArg = undefined */
-) {
-  var O = toObject$2(arrayLike);
-  var C = typeof this == 'function' ? this : Array;
-  var argumentsLength = arguments.length;
-  var mapfn = argumentsLength > 1 ? arguments[1] : undefined;
-  var mapping = mapfn !== undefined;
-  var iteratorMethod = getIteratorMethod$2(O);
-  var index = 0;
-  var length, result, step, iterator, next, value;
-  if (mapping) mapfn = functionBindContext$2(mapfn, argumentsLength > 2 ? arguments[2] : undefined, 2); // if the target is not iterable or it's an array with the default iterator - use a simple case
-
-  if (iteratorMethod != undefined && !(C == Array && isArrayIteratorMethod$2(iteratorMethod))) {
-    iterator = iteratorMethod.call(O);
-    next = iterator.next;
-    result = new C();
-
-    for (; !(step = next.call(iterator)).done; index++) {
-      value = mapping ? callWithSafeIterationClosing$2(iterator, mapfn, [step.value, index], true) : step.value;
-      createProperty$2(result, index, value);
-    }
-  } else {
-    length = toLength$2(O.length);
-    result = new C(length);
-
-    for (; length > index; index++) {
-      value = mapping ? mapfn(O[index], index) : O[index];
-      createProperty$2(result, index, value);
-    }
-  }
-
-  result.length = index;
-  return result;
-}; // based on https://github.com/bestiejs/punycode.js/blob/master/punycode.js
-
-
-var maxInt$1 = 2147483647; // aka. 0x7FFFFFFF or 2^31-1
-
-var base$1 = 36;
-var tMin$1 = 1;
-var tMax$1 = 26;
-var skew$1 = 38;
-var damp$1 = 700;
-var initialBias$1 = 72;
-var initialN$1 = 128; // 0x80
-
-var delimiter$1 = '-'; // '\x2D'
-
-var regexNonASCII$1 = /[^\0-\u007E]/; // non-ASCII chars
-
-var regexSeparators$1 = /[.\u3002\uFF0E\uFF61]/g; // RFC 3490 separators
-
-var OVERFLOW_ERROR$1 = 'Overflow: input needs wider integers to process';
-var baseMinusTMin$1 = base$1 - tMin$1;
-var floor$1$1 = Math.floor;
-var stringFromCharCode = String.fromCharCode;
-/**
- * Creates an array containing the numeric code points of each Unicode
- * character in the string. While JavaScript uses UCS-2 internally,
- * this function will convert a pair of surrogate halves (each of which
- * UCS-2 exposes as separate characters) into a single code point,
- * matching UTF-16.
- */
-
-var ucs2decode$1 = function ucs2decode(string) {
-  var output = [];
-  var counter = 0;
-  var length = string.length;
-
-  while (counter < length) {
-    var value = string.charCodeAt(counter++);
-
-    if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
-      // It's a high surrogate, and there is a next character.
-      var extra = string.charCodeAt(counter++);
-
-      if ((extra & 0xFC00) == 0xDC00) {
-        // Low surrogate.
-        output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
-      } else {
-        // It's an unmatched surrogate; only append this code unit, in case the
-        // next code unit is the high surrogate of a surrogate pair.
-        output.push(value);
-        counter--;
-      }
-    } else {
-      output.push(value);
-    }
-  }
-
-  return output;
-};
-/**
- * Converts a digit/integer into a basic code point.
- */
-
-
-var digitToBasic$1 = function digitToBasic(digit) {
-  //  0..25 map to ASCII a..z or A..Z
-  // 26..35 map to ASCII 0..9
-  return digit + 22 + 75 * (digit < 26);
-};
-/**
- * Bias adaptation function as per section 3.4 of RFC 3492.
- * https://tools.ietf.org/html/rfc3492#section-3.4
- */
-
-
-var adapt$1 = function adapt(delta, numPoints, firstTime) {
-  var k = 0;
-  delta = firstTime ? floor$1$1(delta / damp$1) : delta >> 1;
-  delta += floor$1$1(delta / numPoints);
-
-  for (; delta > baseMinusTMin$1 * tMax$1 >> 1; k += base$1) {
-    delta = floor$1$1(delta / baseMinusTMin$1);
-  }
-
-  return floor$1$1(k + (baseMinusTMin$1 + 1) * delta / (delta + skew$1));
-};
-/**
- * Converts a string of Unicode symbols (e.g. a domain name label) to a
- * Punycode string of ASCII-only symbols.
- */
-// eslint-disable-next-line max-statements -- TODO
-
-
-var encode$1 = function encode(input) {
-  var output = []; // Convert the input in UCS-2 to an array of Unicode code points.
-
-  input = ucs2decode$1(input); // Cache the length.
-
-  var inputLength = input.length; // Initialize the state.
-
-  var n = initialN$1;
-  var delta = 0;
-  var bias = initialBias$1;
-  var i, currentValue; // Handle the basic code points.
-
-  for (i = 0; i < input.length; i++) {
-    currentValue = input[i];
-
-    if (currentValue < 0x80) {
-      output.push(stringFromCharCode(currentValue));
-    }
-  }
-
-  var basicLength = output.length; // number of basic code points.
-
-  var handledCPCount = basicLength; // number of code points that have been handled;
-  // Finish the basic string with a delimiter unless it's empty.
-
-  if (basicLength) {
-    output.push(delimiter$1);
-  } // Main encoding loop:
-
-
-  while (handledCPCount < inputLength) {
-    // All non-basic code points < n have been handled already. Find the next larger one:
-    var m = maxInt$1;
-
-    for (i = 0; i < input.length; i++) {
-      currentValue = input[i];
-
-      if (currentValue >= n && currentValue < m) {
-        m = currentValue;
-      }
-    } // Increase `delta` enough to advance the decoder's <n,i> state to <m,0>, but guard against overflow.
-
-
-    var handledCPCountPlusOne = handledCPCount + 1;
-
-    if (m - n > floor$1$1((maxInt$1 - delta) / handledCPCountPlusOne)) {
-      throw RangeError(OVERFLOW_ERROR$1);
-    }
-
-    delta += (m - n) * handledCPCountPlusOne;
-    n = m;
-
-    for (i = 0; i < input.length; i++) {
-      currentValue = input[i];
-
-      if (currentValue < n && ++delta > maxInt$1) {
-        throw RangeError(OVERFLOW_ERROR$1);
-      }
-
-      if (currentValue == n) {
-        // Represent delta as a generalized variable-length integer.
-        var q = delta;
-
-        for (var k = base$1;;
-        /* no condition */
-        k += base$1) {
-          var t = k <= bias ? tMin$1 : k >= bias + tMax$1 ? tMax$1 : k - bias;
-          if (q < t) break;
-          var qMinusT = q - t;
-          var baseMinusT = base$1 - t;
-          output.push(stringFromCharCode(digitToBasic$1(t + qMinusT % baseMinusT)));
-          q = floor$1$1(qMinusT / baseMinusT);
-        }
-
-        output.push(stringFromCharCode(digitToBasic$1(q)));
-        bias = adapt$1(delta, handledCPCountPlusOne, handledCPCount == basicLength);
-        delta = 0;
-        ++handledCPCount;
-      }
-    }
-
-    ++delta;
-    ++n;
-  }
-
-  return output.join('');
-};
-
-var stringPunycodeToAscii$1 = function stringPunycodeToAscii(input) {
-  var encoded = [];
-  var labels = input.toLowerCase().replace(regexSeparators$1, ".").split('.');
-  var i, label;
-
-  for (i = 0; i < labels.length; i++) {
-    label = labels[i];
-    encoded.push(regexNonASCII$1.test(label) ? 'xn--' + encode$1(label) : label);
-  }
-
-  return encoded.join('.');
-};
-
-var UNSCOPABLES$2 = wellKnownSymbol$2('unscopables');
-var ArrayPrototype$4 = Array.prototype; // Array.prototype[@@unscopables]
-// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-
-if (ArrayPrototype$4[UNSCOPABLES$2] == undefined) {
-  objectDefineProperty$2.f(ArrayPrototype$4, UNSCOPABLES$2, {
-    configurable: true,
-    value: objectCreate$2(null)
-  });
-} // add a key to Array.prototype[@@unscopables]
-
-
-var addToUnscopables$2 = function addToUnscopables(key) {
-  ArrayPrototype$4[UNSCOPABLES$2][key] = true;
-};
-
-var ARRAY_ITERATOR$2 = 'Array Iterator';
-var setInternalState$2$1 = internalState$2.set;
-var getInternalState$7 = internalState$2.getterFor(ARRAY_ITERATOR$2); // `Array.prototype.entries` method
-// https://tc39.es/ecma262/#sec-array.prototype.entries
-// `Array.prototype.keys` method
-// https://tc39.es/ecma262/#sec-array.prototype.keys
-// `Array.prototype.values` method
-// https://tc39.es/ecma262/#sec-array.prototype.values
-// `Array.prototype[@@iterator]` method
-// https://tc39.es/ecma262/#sec-array.prototype-@@iterator
-// `CreateArrayIterator` internal method
-// https://tc39.es/ecma262/#sec-createarrayiterator
-
-defineIterator$2(Array, 'Array', function (iterated, kind) {
-  setInternalState$2$1(this, {
-    type: ARRAY_ITERATOR$2,
-    target: toIndexedObject$2(iterated),
-    // target
-    index: 0,
-    // next index
-    kind: kind // kind
-
-  }); // `%ArrayIteratorPrototype%.next` method
-  // https://tc39.es/ecma262/#sec-%arrayiteratorprototype%.next
-}, function () {
-  var state = getInternalState$7(this);
-  var target = state.target;
-  var kind = state.kind;
-  var index = state.index++;
-
-  if (!target || index >= target.length) {
-    state.target = undefined;
-    return {
-      value: undefined,
-      done: true
-    };
-  }
-
-  if (kind == 'keys') return {
-    value: index,
-    done: false
-  };
-  if (kind == 'values') return {
-    value: target[index],
-    done: false
-  };
-  return {
-    value: [index, target[index]],
-    done: false
-  };
-}, 'values'); // argumentsList[@@iterator] is %ArrayProto_values%
-// https://tc39.es/ecma262/#sec-createunmappedargumentsobject
-// https://tc39.es/ecma262/#sec-createmappedargumentsobject
-
-iterators$2.Arguments = iterators$2.Array; // https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-
-addToUnscopables$2('keys');
-addToUnscopables$2('values');
-addToUnscopables$2('entries');
-
-var redefineAll = function redefineAll(target, src, options) {
-  for (var key in src) {
-    redefine$1(target, key, src[key], options);
-  }
-
-  return target;
-};
-
-var getIterator$1 = function getIterator(it) {
-  var iteratorMethod = getIteratorMethod$2(it);
-
-  if (typeof iteratorMethod != 'function') {
-    throw TypeError(String(it) + ' is not iterable');
-  }
-
-  return anObject$2(iteratorMethod.call(it));
-}; // TODO: in core-js@4, move /modules/ dependencies to public entries for better optimization by tools like `preset-env`
-
-
-var $fetch = getBuiltIn$2('fetch');
-var Headers$1 = getBuiltIn$2('Headers');
-var ITERATOR$e = wellKnownSymbol$2('iterator');
-var URL_SEARCH_PARAMS$1 = 'URLSearchParams';
-var URL_SEARCH_PARAMS_ITERATOR$1 = URL_SEARCH_PARAMS$1 + 'Iterator';
-var setInternalState$1$1 = internalState$2.set;
-var getInternalParamsState$1 = internalState$2.getterFor(URL_SEARCH_PARAMS$1);
-var getInternalIteratorState$1 = internalState$2.getterFor(URL_SEARCH_PARAMS_ITERATOR$1);
-var plus$1 = /\+/g;
-var sequences$1 = Array(4);
-
-var percentSequence$1 = function percentSequence(bytes) {
-  return sequences$1[bytes - 1] || (sequences$1[bytes - 1] = RegExp('((?:%[\\da-f]{2}){' + bytes + '})', 'gi'));
-};
-
-var percentDecode$1 = function percentDecode(sequence) {
-  try {
-    return decodeURIComponent(sequence);
-  } catch (error) {
-    return sequence;
-  }
-};
-
-var deserialize$1 = function deserialize(it) {
-  var result = it.replace(plus$1, ' ');
-  var bytes = 4;
-
-  try {
-    return decodeURIComponent(result);
-  } catch (error) {
-    while (bytes) {
-      result = result.replace(percentSequence$1(bytes--), percentDecode$1);
-    }
-
-    return result;
-  }
-};
-
-var find$2 = /[!'()~]|%20/g;
-var replace$9 = {
-  '!': '%21',
-  "'": '%27',
-  '(': '%28',
-  ')': '%29',
-  '~': '%7E',
-  '%20': '+'
-};
-
-var replacer$1 = function replacer(match) {
-  return replace$9[match];
-};
-
-var serialize$1 = function serialize(it) {
-  return encodeURIComponent(it).replace(find$2, replacer$1);
-};
-
-var parseSearchParams = function parseSearchParams(result, query) {
-  if (query) {
-    var attributes = query.split('&');
-    var index = 0;
-    var attribute, entry;
-
-    while (index < attributes.length) {
-      attribute = attributes[index++];
-
-      if (attribute.length) {
-        entry = attribute.split('=');
-        result.push({
-          key: deserialize$1(entry.shift()),
-          value: deserialize$1(entry.join('='))
-        });
-      }
-    }
-  }
-};
-
-var updateSearchParams = function updateSearchParams(query) {
-  this.entries.length = 0;
-  parseSearchParams(this.entries, query);
-};
-
-var validateArgumentsLength$1 = function validateArgumentsLength(passed, required) {
-  if (passed < required) throw TypeError('Not enough arguments');
-};
-
-var URLSearchParamsIterator$1 = createIteratorConstructor$2(function Iterator(params, kind) {
-  setInternalState$1$1(this, {
-    type: URL_SEARCH_PARAMS_ITERATOR$1,
-    iterator: getIterator$1(getInternalParamsState$1(params).entries),
-    kind: kind
-  });
-}, 'Iterator', function next() {
-  var state = getInternalIteratorState$1(this);
-  var kind = state.kind;
-  var step = state.iterator.next();
-  var entry = step.value;
-
-  if (!step.done) {
-    step.value = kind === 'keys' ? entry.key : kind === 'values' ? entry.value : [entry.key, entry.value];
-  }
-
-  return step;
-}); // `URLSearchParams` constructor
-// https://url.spec.whatwg.org/#interface-urlsearchparams
-
-var URLSearchParamsConstructor$1 = function URLSearchParams()
-/* init */
-{
-  anInstance$1(this, URLSearchParamsConstructor$1, URL_SEARCH_PARAMS$1);
-  var init = arguments.length > 0 ? arguments[0] : undefined;
-  var that = this;
-  var entries = [];
-  var iteratorMethod, iterator, next, step, entryIterator, entryNext, first, second, key;
-  setInternalState$1$1(that, {
-    type: URL_SEARCH_PARAMS$1,
-    entries: entries,
-    updateURL: function updateURL() {
-      /* empty */
-    },
-    updateSearchParams: updateSearchParams
-  });
-
-  if (init !== undefined) {
-    if (isObject$2(init)) {
-      iteratorMethod = getIteratorMethod$2(init);
-
-      if (typeof iteratorMethod === 'function') {
-        iterator = iteratorMethod.call(init);
-        next = iterator.next;
-
-        while (!(step = next.call(iterator)).done) {
-          entryIterator = getIterator$1(anObject$2(step.value));
-          entryNext = entryIterator.next;
-          if ((first = entryNext.call(entryIterator)).done || (second = entryNext.call(entryIterator)).done || !entryNext.call(entryIterator).done) throw TypeError('Expected sequence with length 2');
-          entries.push({
-            key: first.value + '',
-            value: second.value + ''
-          });
-        }
-      } else for (key in init) {
-        if (has$1$1(init, key)) entries.push({
-          key: key,
-          value: init[key] + ''
-        });
-      }
-    } else {
-      parseSearchParams(entries, typeof init === 'string' ? init.charAt(0) === '?' ? init.slice(1) : init : init + '');
-    }
-  }
-};
-
-var URLSearchParamsPrototype$1 = URLSearchParamsConstructor$1.prototype;
-redefineAll(URLSearchParamsPrototype$1, {
-  // `URLSearchParams.prototype.append` method
-  // https://url.spec.whatwg.org/#dom-urlsearchparams-append
-  append: function append(name, value) {
-    validateArgumentsLength$1(arguments.length, 2);
-    var state = getInternalParamsState$1(this);
-    state.entries.push({
-      key: name + '',
-      value: value + ''
-    });
-    state.updateURL();
-  },
-  // `URLSearchParams.prototype.delete` method
-  // https://url.spec.whatwg.org/#dom-urlsearchparams-delete
-  'delete': function _delete(name) {
-    validateArgumentsLength$1(arguments.length, 1);
-    var state = getInternalParamsState$1(this);
-    var entries = state.entries;
-    var key = name + '';
-    var index = 0;
-
-    while (index < entries.length) {
-      if (entries[index].key === key) entries.splice(index, 1);else index++;
-    }
-
-    state.updateURL();
-  },
-  // `URLSearchParams.prototype.get` method
-  // https://url.spec.whatwg.org/#dom-urlsearchparams-get
-  get: function get(name) {
-    validateArgumentsLength$1(arguments.length, 1);
-    var entries = getInternalParamsState$1(this).entries;
-    var key = name + '';
-    var index = 0;
-
-    for (; index < entries.length; index++) {
-      if (entries[index].key === key) return entries[index].value;
-    }
-
-    return null;
-  },
-  // `URLSearchParams.prototype.getAll` method
-  // https://url.spec.whatwg.org/#dom-urlsearchparams-getall
-  getAll: function getAll(name) {
-    validateArgumentsLength$1(arguments.length, 1);
-    var entries = getInternalParamsState$1(this).entries;
-    var key = name + '';
-    var result = [];
-    var index = 0;
-
-    for (; index < entries.length; index++) {
-      if (entries[index].key === key) result.push(entries[index].value);
-    }
-
-    return result;
-  },
-  // `URLSearchParams.prototype.has` method
-  // https://url.spec.whatwg.org/#dom-urlsearchparams-has
-  has: function has(name) {
-    validateArgumentsLength$1(arguments.length, 1);
-    var entries = getInternalParamsState$1(this).entries;
-    var key = name + '';
-    var index = 0;
-
-    while (index < entries.length) {
-      if (entries[index++].key === key) return true;
-    }
-
-    return false;
-  },
-  // `URLSearchParams.prototype.set` method
-  // https://url.spec.whatwg.org/#dom-urlsearchparams-set
-  set: function set(name, value) {
-    validateArgumentsLength$1(arguments.length, 1);
-    var state = getInternalParamsState$1(this);
-    var entries = state.entries;
-    var found = false;
-    var key = name + '';
-    var val = value + '';
-    var index = 0;
-    var entry;
-
-    for (; index < entries.length; index++) {
-      entry = entries[index];
-
-      if (entry.key === key) {
-        if (found) entries.splice(index--, 1);else {
-          found = true;
-          entry.value = val;
-        }
-      }
-    }
-
-    if (!found) entries.push({
-      key: key,
-      value: val
-    });
-    state.updateURL();
-  },
-  // `URLSearchParams.prototype.sort` method
-  // https://url.spec.whatwg.org/#dom-urlsearchparams-sort
-  sort: function sort() {
-    var state = getInternalParamsState$1(this);
-    var entries = state.entries; // Array#sort is not stable in some engines
-
-    var slice = entries.slice();
-    var entry, entriesIndex, sliceIndex;
-    entries.length = 0;
-
-    for (sliceIndex = 0; sliceIndex < slice.length; sliceIndex++) {
-      entry = slice[sliceIndex];
-
-      for (entriesIndex = 0; entriesIndex < sliceIndex; entriesIndex++) {
-        if (entries[entriesIndex].key > entry.key) {
-          entries.splice(entriesIndex, 0, entry);
-          break;
-        }
-      }
-
-      if (entriesIndex === sliceIndex) entries.push(entry);
-    }
-
-    state.updateURL();
-  },
-  // `URLSearchParams.prototype.forEach` method
-  forEach: function forEach(callback
-  /* , thisArg */
-  ) {
-    var entries = getInternalParamsState$1(this).entries;
-    var boundFunction = functionBindContext$2(callback, arguments.length > 1 ? arguments[1] : undefined, 3);
-    var index = 0;
-    var entry;
-
-    while (index < entries.length) {
-      entry = entries[index++];
-      boundFunction(entry.value, entry.key, this);
-    }
-  },
-  // `URLSearchParams.prototype.keys` method
-  keys: function keys() {
-    return new URLSearchParamsIterator$1(this, 'keys');
-  },
-  // `URLSearchParams.prototype.values` method
-  values: function values() {
-    return new URLSearchParamsIterator$1(this, 'values');
-  },
-  // `URLSearchParams.prototype.entries` method
-  entries: function entries() {
-    return new URLSearchParamsIterator$1(this, 'entries');
-  }
-}, {
-  enumerable: true
-}); // `URLSearchParams.prototype[@@iterator]` method
-
-redefine$1(URLSearchParamsPrototype$1, ITERATOR$e, URLSearchParamsPrototype$1.entries); // `URLSearchParams.prototype.toString` method
-// https://url.spec.whatwg.org/#urlsearchparams-stringification-behavior
-
-redefine$1(URLSearchParamsPrototype$1, 'toString', function toString() {
-  var entries = getInternalParamsState$1(this).entries;
-  var result = [];
-  var index = 0;
-  var entry;
-
-  while (index < entries.length) {
-    entry = entries[index++];
-    result.push(serialize$1(entry.key) + '=' + serialize$1(entry.value));
-  }
-
-  return result.join('&');
-}, {
-  enumerable: true
-});
-setToStringTag$2(URLSearchParamsConstructor$1, URL_SEARCH_PARAMS$1);
-
-_export$2({
-  global: true,
-  forced: !nativeUrl$1
-}, {
-  URLSearchParams: URLSearchParamsConstructor$1
-}); // Wrap `fetch` for correct work with polyfilled `URLSearchParams`
-// https://github.com/zloirock/core-js/issues/674
-
-
-if (!nativeUrl$1 && typeof $fetch == 'function' && typeof Headers$1 == 'function') {
-  _export$2({
-    global: true,
-    enumerable: true,
-    forced: true
-  }, {
-    fetch: function fetch(input
-    /* , init */
-    ) {
-      var args = [input];
-      var init, body, headers;
-
-      if (arguments.length > 1) {
-        init = arguments[1];
-
-        if (isObject$2(init)) {
-          body = init.body;
-
-          if (classof$2(body) === URL_SEARCH_PARAMS$1) {
-            headers = init.headers ? new Headers$1(init.headers) : new Headers$1();
-
-            if (!headers.has('content-type')) {
-              headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-            }
-
-            init = objectCreate$2(init, {
-              body: createPropertyDescriptor$2(0, String(body)),
-              headers: createPropertyDescriptor$2(0, headers)
-            });
-          }
-        }
-
-        args.push(init);
-      }
-
-      return $fetch.apply(this, args);
-    }
-  });
-}
-
-var web_urlSearchParams = {
-  URLSearchParams: URLSearchParamsConstructor$1,
-  getState: getInternalParamsState$1
-}; // TODO: in core-js@4, move /modules/ dependencies to public entries for better optimization by tools like `preset-env`
-
-var codeAt$1 = stringMultibyte$2.codeAt;
-var NativeURL$1 = global_1$2.URL;
-var URLSearchParams$1$1 = web_urlSearchParams.URLSearchParams;
-var getInternalSearchParamsState$1 = web_urlSearchParams.getState;
-var setInternalState$9 = internalState$2.set;
-var getInternalURLState$1 = internalState$2.getterFor('URL');
-var floor$7 = Math.floor;
-var pow$2 = Math.pow;
-var INVALID_AUTHORITY$1 = 'Invalid authority';
-var INVALID_SCHEME$1 = 'Invalid scheme';
-var INVALID_HOST$1 = 'Invalid host';
-var INVALID_PORT$1 = 'Invalid port';
-var ALPHA$1 = /[A-Za-z]/;
-var ALPHANUMERIC$1 = /[\d+-.A-Za-z]/;
-var DIGIT$1 = /\d/;
-var HEX_START$1 = /^(0x|0X)/;
-var OCT$1 = /^[0-7]+$/;
-var DEC$1 = /^\d+$/;
-var HEX$1 = /^[\dA-Fa-f]+$/;
-/* eslint-disable no-control-regex -- safe */
-
-var FORBIDDEN_HOST_CODE_POINT$1 = /[\u0000\t\u000A\u000D #%/:?@[\\]]/;
-var FORBIDDEN_HOST_CODE_POINT_EXCLUDING_PERCENT$1 = /[\u0000\t\u000A\u000D #/:?@[\\]]/;
-var LEADING_AND_TRAILING_C0_CONTROL_OR_SPACE$1 = /^[\u0000-\u001F ]+|[\u0000-\u001F ]+$/g;
-var TAB_AND_NEW_LINE$1 = /[\t\u000A\u000D]/g;
-/* eslint-enable no-control-regex -- safe */
-
-var EOF$1;
-
-var parseHost = function parseHost(url, input) {
-  var result, codePoints, index;
-
-  if (input.charAt(0) == '[') {
-    if (input.charAt(input.length - 1) != ']') return INVALID_HOST$1;
-    result = parseIPv6$1(input.slice(1, -1));
-    if (!result) return INVALID_HOST$1;
-    url.host = result; // opaque host
-  } else if (!isSpecial(url)) {
-    if (FORBIDDEN_HOST_CODE_POINT_EXCLUDING_PERCENT$1.test(input)) return INVALID_HOST$1;
-    result = '';
-    codePoints = arrayFrom$2(input);
-
-    for (index = 0; index < codePoints.length; index++) {
-      result += percentEncode$1(codePoints[index], C0ControlPercentEncodeSet$1);
-    }
-
-    url.host = result;
-  } else {
-    input = stringPunycodeToAscii$1(input);
-    if (FORBIDDEN_HOST_CODE_POINT$1.test(input)) return INVALID_HOST$1;
-    result = parseIPv4$1(input);
-    if (result === null) return INVALID_HOST$1;
-    url.host = result;
-  }
-};
-
-var parseIPv4$1 = function parseIPv4(input) {
-  var parts = input.split('.');
-  var partsLength, numbers, index, part, radix, number, ipv4;
-
-  if (parts.length && parts[parts.length - 1] == '') {
-    parts.pop();
-  }
-
-  partsLength = parts.length;
-  if (partsLength > 4) return input;
-  numbers = [];
-
-  for (index = 0; index < partsLength; index++) {
-    part = parts[index];
-    if (part == '') return input;
-    radix = 10;
-
-    if (part.length > 1 && part.charAt(0) == '0') {
-      radix = HEX_START$1.test(part) ? 16 : 8;
-      part = part.slice(radix == 8 ? 1 : 2);
-    }
-
-    if (part === '') {
-      number = 0;
-    } else {
-      if (!(radix == 10 ? DEC$1 : radix == 8 ? OCT$1 : HEX$1).test(part)) return input;
-      number = parseInt(part, radix);
-    }
-
-    numbers.push(number);
-  }
-
-  for (index = 0; index < partsLength; index++) {
-    number = numbers[index];
-
-    if (index == partsLength - 1) {
-      if (number >= pow$2(256, 5 - partsLength)) return null;
-    } else if (number > 255) return null;
-  }
-
-  ipv4 = numbers.pop();
-
-  for (index = 0; index < numbers.length; index++) {
-    ipv4 += numbers[index] * pow$2(256, 3 - index);
-  }
-
-  return ipv4;
-}; // eslint-disable-next-line max-statements -- TODO
-
-
-var parseIPv6$1 = function parseIPv6(input) {
-  var address = [0, 0, 0, 0, 0, 0, 0, 0];
-  var pieceIndex = 0;
-  var compress = null;
-  var pointer = 0;
-  var value, length, numbersSeen, ipv4Piece, number, swaps, swap;
-
-  var char = function char() {
-    return input.charAt(pointer);
-  };
-
-  if (char() == ':') {
-    if (input.charAt(1) != ':') return;
-    pointer += 2;
-    pieceIndex++;
-    compress = pieceIndex;
-  }
-
-  while (char()) {
-    if (pieceIndex == 8) return;
-
-    if (char() == ':') {
-      if (compress !== null) return;
-      pointer++;
-      pieceIndex++;
-      compress = pieceIndex;
-      continue;
-    }
-
-    value = length = 0;
-
-    while (length < 4 && HEX$1.test(char())) {
-      value = value * 16 + parseInt(char(), 16);
-      pointer++;
-      length++;
-    }
-
-    if (char() == '.') {
-      if (length == 0) return;
-      pointer -= length;
-      if (pieceIndex > 6) return;
-      numbersSeen = 0;
-
-      while (char()) {
-        ipv4Piece = null;
-
-        if (numbersSeen > 0) {
-          if (char() == '.' && numbersSeen < 4) pointer++;else return;
-        }
-
-        if (!DIGIT$1.test(char())) return;
-
-        while (DIGIT$1.test(char())) {
-          number = parseInt(char(), 10);
-          if (ipv4Piece === null) ipv4Piece = number;else if (ipv4Piece == 0) return;else ipv4Piece = ipv4Piece * 10 + number;
-          if (ipv4Piece > 255) return;
-          pointer++;
-        }
-
-        address[pieceIndex] = address[pieceIndex] * 256 + ipv4Piece;
-        numbersSeen++;
-        if (numbersSeen == 2 || numbersSeen == 4) pieceIndex++;
-      }
-
-      if (numbersSeen != 4) return;
-      break;
-    } else if (char() == ':') {
-      pointer++;
-      if (!char()) return;
-    } else if (char()) return;
-
-    address[pieceIndex++] = value;
-  }
-
-  if (compress !== null) {
-    swaps = pieceIndex - compress;
-    pieceIndex = 7;
-
-    while (pieceIndex != 0 && swaps > 0) {
-      swap = address[pieceIndex];
-      address[pieceIndex--] = address[compress + swaps - 1];
-      address[compress + --swaps] = swap;
-    }
-  } else if (pieceIndex != 8) return;
-
-  return address;
-};
-
-var findLongestZeroSequence$1 = function findLongestZeroSequence(ipv6) {
-  var maxIndex = null;
-  var maxLength = 1;
-  var currStart = null;
-  var currLength = 0;
-  var index = 0;
-
-  for (; index < 8; index++) {
-    if (ipv6[index] !== 0) {
-      if (currLength > maxLength) {
-        maxIndex = currStart;
-        maxLength = currLength;
-      }
-
-      currStart = null;
-      currLength = 0;
-    } else {
-      if (currStart === null) currStart = index;
-      ++currLength;
-    }
-  }
-
-  if (currLength > maxLength) {
-    maxIndex = currStart;
-    maxLength = currLength;
-  }
-
-  return maxIndex;
-};
-
-var serializeHost$1 = function serializeHost(host) {
-  var result, index, compress, ignore0; // ipv4
-
-  if (typeof host == 'number') {
-    result = [];
-
-    for (index = 0; index < 4; index++) {
-      result.unshift(host % 256);
-      host = floor$7(host / 256);
-    }
-
-    return result.join('.'); // ipv6
-  } else if (_typeof(host) == 'object') {
-    result = '';
-    compress = findLongestZeroSequence$1(host);
-
-    for (index = 0; index < 8; index++) {
-      if (ignore0 && host[index] === 0) continue;
-      if (ignore0) ignore0 = false;
-
-      if (compress === index) {
-        result += index ? ':' : '::';
-        ignore0 = true;
-      } else {
-        result += host[index].toString(16);
-        if (index < 7) result += ':';
-      }
-    }
-
-    return '[' + result + ']';
-  }
-
-  return host;
-};
-
-var C0ControlPercentEncodeSet$1 = {};
-var fragmentPercentEncodeSet$1 = objectAssign$1({}, C0ControlPercentEncodeSet$1, {
-  ' ': 1,
-  '"': 1,
-  '<': 1,
-  '>': 1,
-  '`': 1
-});
-var pathPercentEncodeSet$1 = objectAssign$1({}, fragmentPercentEncodeSet$1, {
-  '#': 1,
-  '?': 1,
-  '{': 1,
-  '}': 1
-});
-var userinfoPercentEncodeSet$1 = objectAssign$1({}, pathPercentEncodeSet$1, {
-  '/': 1,
-  ':': 1,
-  ';': 1,
-  '=': 1,
-  '@': 1,
-  '[': 1,
-  '\\': 1,
-  ']': 1,
-  '^': 1,
-  '|': 1
-});
-
-var percentEncode$1 = function percentEncode(char, set) {
-  var code = codeAt$1(char, 0);
-  return code > 0x20 && code < 0x7F && !has$1$1(set, char) ? char : encodeURIComponent(char);
-};
-
-var specialSchemes$1 = {
-  ftp: 21,
-  file: null,
-  http: 80,
-  https: 443,
-  ws: 80,
-  wss: 443
-};
-
-var isSpecial = function isSpecial(url) {
-  return has$1$1(specialSchemes$1, url.scheme);
-};
-
-var includesCredentials = function includesCredentials(url) {
-  return url.username != '' || url.password != '';
-};
-
-var cannotHaveUsernamePasswordPort = function cannotHaveUsernamePasswordPort(url) {
-  return !url.host || url.cannotBeABaseURL || url.scheme == 'file';
-};
-
-var isWindowsDriveLetter$1 = function isWindowsDriveLetter(string, normalized) {
-  var second;
-  return string.length == 2 && ALPHA$1.test(string.charAt(0)) && ((second = string.charAt(1)) == ':' || !normalized && second == '|');
-};
-
-var startsWithWindowsDriveLetter$1 = function startsWithWindowsDriveLetter(string) {
-  var third;
-  return string.length > 1 && isWindowsDriveLetter$1(string.slice(0, 2)) && (string.length == 2 || (third = string.charAt(2)) === '/' || third === '\\' || third === '?' || third === '#');
-};
-
-var shortenURLsPath = function shortenURLsPath(url) {
-  var path = url.path;
-  var pathSize = path.length;
-
-  if (pathSize && (url.scheme != 'file' || pathSize != 1 || !isWindowsDriveLetter$1(path[0], true))) {
-    path.pop();
-  }
-};
-
-var isSingleDot$1 = function isSingleDot(segment) {
-  return segment === '.' || segment.toLowerCase() === '%2e';
-};
-
-var isDoubleDot$1 = function isDoubleDot(segment) {
-  segment = segment.toLowerCase();
-  return segment === '..' || segment === '%2e.' || segment === '.%2e' || segment === '%2e%2e';
-}; // States:
-
-
-var SCHEME_START$1 = {};
-var SCHEME$1 = {};
-var NO_SCHEME$1 = {};
-var SPECIAL_RELATIVE_OR_AUTHORITY$1 = {};
-var PATH_OR_AUTHORITY$1 = {};
-var RELATIVE$1 = {};
-var RELATIVE_SLASH$1 = {};
-var SPECIAL_AUTHORITY_SLASHES$1 = {};
-var SPECIAL_AUTHORITY_IGNORE_SLASHES$1 = {};
-var AUTHORITY$1 = {};
-var HOST$1 = {};
-var HOSTNAME$1 = {};
-var PORT$1 = {};
-var FILE$1 = {};
-var FILE_SLASH$1 = {};
-var FILE_HOST$1 = {};
-var PATH_START$1 = {};
-var PATH$1 = {};
-var CANNOT_BE_A_BASE_URL_PATH$1 = {};
-var QUERY$1 = {};
-var FRAGMENT$1 = {}; // eslint-disable-next-line max-statements -- TODO
-
-var parseURL = function parseURL(url, input, stateOverride, base) {
-  var state = stateOverride || SCHEME_START$1;
-  var pointer = 0;
-  var buffer = '';
-  var seenAt = false;
-  var seenBracket = false;
-  var seenPasswordToken = false;
-  var codePoints, char, bufferCodePoints, failure;
-
-  if (!stateOverride) {
-    url.scheme = '';
-    url.username = '';
-    url.password = '';
-    url.host = null;
-    url.port = null;
-    url.path = [];
-    url.query = null;
-    url.fragment = null;
-    url.cannotBeABaseURL = false;
-    input = input.replace(LEADING_AND_TRAILING_C0_CONTROL_OR_SPACE$1, '');
-  }
-
-  input = input.replace(TAB_AND_NEW_LINE$1, '');
-  codePoints = arrayFrom$2(input);
-
-  while (pointer <= codePoints.length) {
-    char = codePoints[pointer];
-
-    switch (state) {
-      case SCHEME_START$1:
-        if (char && ALPHA$1.test(char)) {
-          buffer += char.toLowerCase();
-          state = SCHEME$1;
-        } else if (!stateOverride) {
-          state = NO_SCHEME$1;
-          continue;
-        } else return INVALID_SCHEME$1;
-
-        break;
-
-      case SCHEME$1:
-        if (char && (ALPHANUMERIC$1.test(char) || char == '+' || char == '-' || char == '.')) {
-          buffer += char.toLowerCase();
-        } else if (char == ':') {
-          if (stateOverride && (isSpecial(url) != has$1$1(specialSchemes$1, buffer) || buffer == 'file' && (includesCredentials(url) || url.port !== null) || url.scheme == 'file' && !url.host)) return;
-          url.scheme = buffer;
-
-          if (stateOverride) {
-            if (isSpecial(url) && specialSchemes$1[url.scheme] == url.port) url.port = null;
-            return;
-          }
-
-          buffer = '';
-
-          if (url.scheme == 'file') {
-            state = FILE$1;
-          } else if (isSpecial(url) && base && base.scheme == url.scheme) {
-            state = SPECIAL_RELATIVE_OR_AUTHORITY$1;
-          } else if (isSpecial(url)) {
-            state = SPECIAL_AUTHORITY_SLASHES$1;
-          } else if (codePoints[pointer + 1] == '/') {
-            state = PATH_OR_AUTHORITY$1;
-            pointer++;
-          } else {
-            url.cannotBeABaseURL = true;
-            url.path.push('');
-            state = CANNOT_BE_A_BASE_URL_PATH$1;
-          }
-        } else if (!stateOverride) {
-          buffer = '';
-          state = NO_SCHEME$1;
-          pointer = 0;
-          continue;
-        } else return INVALID_SCHEME$1;
-
-        break;
-
-      case NO_SCHEME$1:
-        if (!base || base.cannotBeABaseURL && char != '#') return INVALID_SCHEME$1;
-
-        if (base.cannotBeABaseURL && char == '#') {
-          url.scheme = base.scheme;
-          url.path = base.path.slice();
-          url.query = base.query;
-          url.fragment = '';
-          url.cannotBeABaseURL = true;
-          state = FRAGMENT$1;
-          break;
-        }
-
-        state = base.scheme == 'file' ? FILE$1 : RELATIVE$1;
-        continue;
-
-      case SPECIAL_RELATIVE_OR_AUTHORITY$1:
-        if (char == '/' && codePoints[pointer + 1] == '/') {
-          state = SPECIAL_AUTHORITY_IGNORE_SLASHES$1;
-          pointer++;
-        } else {
-          state = RELATIVE$1;
-          continue;
-        }
-
-        break;
-
-      case PATH_OR_AUTHORITY$1:
-        if (char == '/') {
-          state = AUTHORITY$1;
-          break;
-        } else {
-          state = PATH$1;
-          continue;
-        }
-
-      case RELATIVE$1:
-        url.scheme = base.scheme;
-
-        if (char == EOF$1) {
-          url.username = base.username;
-          url.password = base.password;
-          url.host = base.host;
-          url.port = base.port;
-          url.path = base.path.slice();
-          url.query = base.query;
-        } else if (char == '/' || char == '\\' && isSpecial(url)) {
-          state = RELATIVE_SLASH$1;
-        } else if (char == '?') {
-          url.username = base.username;
-          url.password = base.password;
-          url.host = base.host;
-          url.port = base.port;
-          url.path = base.path.slice();
-          url.query = '';
-          state = QUERY$1;
-        } else if (char == '#') {
-          url.username = base.username;
-          url.password = base.password;
-          url.host = base.host;
-          url.port = base.port;
-          url.path = base.path.slice();
-          url.query = base.query;
-          url.fragment = '';
-          state = FRAGMENT$1;
-        } else {
-          url.username = base.username;
-          url.password = base.password;
-          url.host = base.host;
-          url.port = base.port;
-          url.path = base.path.slice();
-          url.path.pop();
-          state = PATH$1;
-          continue;
-        }
-
-        break;
-
-      case RELATIVE_SLASH$1:
-        if (isSpecial(url) && (char == '/' || char == '\\')) {
-          state = SPECIAL_AUTHORITY_IGNORE_SLASHES$1;
-        } else if (char == '/') {
-          state = AUTHORITY$1;
-        } else {
-          url.username = base.username;
-          url.password = base.password;
-          url.host = base.host;
-          url.port = base.port;
-          state = PATH$1;
-          continue;
-        }
-
-        break;
-
-      case SPECIAL_AUTHORITY_SLASHES$1:
-        state = SPECIAL_AUTHORITY_IGNORE_SLASHES$1;
-        if (char != '/' || buffer.charAt(pointer + 1) != '/') continue;
-        pointer++;
-        break;
-
-      case SPECIAL_AUTHORITY_IGNORE_SLASHES$1:
-        if (char != '/' && char != '\\') {
-          state = AUTHORITY$1;
-          continue;
-        }
-
-        break;
-
-      case AUTHORITY$1:
-        if (char == '@') {
-          if (seenAt) buffer = '%40' + buffer;
-          seenAt = true;
-          bufferCodePoints = arrayFrom$2(buffer);
-
-          for (var i = 0; i < bufferCodePoints.length; i++) {
-            var codePoint = bufferCodePoints[i];
-
-            if (codePoint == ':' && !seenPasswordToken) {
-              seenPasswordToken = true;
-              continue;
-            }
-
-            var encodedCodePoints = percentEncode$1(codePoint, userinfoPercentEncodeSet$1);
-            if (seenPasswordToken) url.password += encodedCodePoints;else url.username += encodedCodePoints;
-          }
-
-          buffer = '';
-        } else if (char == EOF$1 || char == '/' || char == '?' || char == '#' || char == '\\' && isSpecial(url)) {
-          if (seenAt && buffer == '') return INVALID_AUTHORITY$1;
-          pointer -= arrayFrom$2(buffer).length + 1;
-          buffer = '';
-          state = HOST$1;
-        } else buffer += char;
-
-        break;
-
-      case HOST$1:
-      case HOSTNAME$1:
-        if (stateOverride && url.scheme == 'file') {
-          state = FILE_HOST$1;
-          continue;
-        } else if (char == ':' && !seenBracket) {
-          if (buffer == '') return INVALID_HOST$1;
-          failure = parseHost(url, buffer);
-          if (failure) return failure;
-          buffer = '';
-          state = PORT$1;
-          if (stateOverride == HOSTNAME$1) return;
-        } else if (char == EOF$1 || char == '/' || char == '?' || char == '#' || char == '\\' && isSpecial(url)) {
-          if (isSpecial(url) && buffer == '') return INVALID_HOST$1;
-          if (stateOverride && buffer == '' && (includesCredentials(url) || url.port !== null)) return;
-          failure = parseHost(url, buffer);
-          if (failure) return failure;
-          buffer = '';
-          state = PATH_START$1;
-          if (stateOverride) return;
-          continue;
-        } else {
-          if (char == '[') seenBracket = true;else if (char == ']') seenBracket = false;
-          buffer += char;
-        }
-
-        break;
-
-      case PORT$1:
-        if (DIGIT$1.test(char)) {
-          buffer += char;
-        } else if (char == EOF$1 || char == '/' || char == '?' || char == '#' || char == '\\' && isSpecial(url) || stateOverride) {
-          if (buffer != '') {
-            var port = parseInt(buffer, 10);
-            if (port > 0xFFFF) return INVALID_PORT$1;
-            url.port = isSpecial(url) && port === specialSchemes$1[url.scheme] ? null : port;
-            buffer = '';
-          }
-
-          if (stateOverride) return;
-          state = PATH_START$1;
-          continue;
-        } else return INVALID_PORT$1;
-
-        break;
-
-      case FILE$1:
-        url.scheme = 'file';
-        if (char == '/' || char == '\\') state = FILE_SLASH$1;else if (base && base.scheme == 'file') {
-          if (char == EOF$1) {
-            url.host = base.host;
-            url.path = base.path.slice();
-            url.query = base.query;
-          } else if (char == '?') {
-            url.host = base.host;
-            url.path = base.path.slice();
-            url.query = '';
-            state = QUERY$1;
-          } else if (char == '#') {
-            url.host = base.host;
-            url.path = base.path.slice();
-            url.query = base.query;
-            url.fragment = '';
-            state = FRAGMENT$1;
-          } else {
-            if (!startsWithWindowsDriveLetter$1(codePoints.slice(pointer).join(''))) {
-              url.host = base.host;
-              url.path = base.path.slice();
-              shortenURLsPath(url);
-            }
-
-            state = PATH$1;
-            continue;
-          }
-        } else {
-          state = PATH$1;
-          continue;
-        }
-        break;
-
-      case FILE_SLASH$1:
-        if (char == '/' || char == '\\') {
-          state = FILE_HOST$1;
-          break;
-        }
-
-        if (base && base.scheme == 'file' && !startsWithWindowsDriveLetter$1(codePoints.slice(pointer).join(''))) {
-          if (isWindowsDriveLetter$1(base.path[0], true)) url.path.push(base.path[0]);else url.host = base.host;
-        }
-
-        state = PATH$1;
-        continue;
-
-      case FILE_HOST$1:
-        if (char == EOF$1 || char == '/' || char == '\\' || char == '?' || char == '#') {
-          if (!stateOverride && isWindowsDriveLetter$1(buffer)) {
-            state = PATH$1;
-          } else if (buffer == '') {
-            url.host = '';
-            if (stateOverride) return;
-            state = PATH_START$1;
-          } else {
-            failure = parseHost(url, buffer);
-            if (failure) return failure;
-            if (url.host == 'localhost') url.host = '';
-            if (stateOverride) return;
-            buffer = '';
-            state = PATH_START$1;
-          }
-
-          continue;
-        } else buffer += char;
-
-        break;
-
-      case PATH_START$1:
-        if (isSpecial(url)) {
-          state = PATH$1;
-          if (char != '/' && char != '\\') continue;
-        } else if (!stateOverride && char == '?') {
-          url.query = '';
-          state = QUERY$1;
-        } else if (!stateOverride && char == '#') {
-          url.fragment = '';
-          state = FRAGMENT$1;
-        } else if (char != EOF$1) {
-          state = PATH$1;
-          if (char != '/') continue;
-        }
-
-        break;
-
-      case PATH$1:
-        if (char == EOF$1 || char == '/' || char == '\\' && isSpecial(url) || !stateOverride && (char == '?' || char == '#')) {
-          if (isDoubleDot$1(buffer)) {
-            shortenURLsPath(url);
-
-            if (char != '/' && !(char == '\\' && isSpecial(url))) {
-              url.path.push('');
-            }
-          } else if (isSingleDot$1(buffer)) {
-            if (char != '/' && !(char == '\\' && isSpecial(url))) {
-              url.path.push('');
-            }
-          } else {
-            if (url.scheme == 'file' && !url.path.length && isWindowsDriveLetter$1(buffer)) {
-              if (url.host) url.host = '';
-              buffer = buffer.charAt(0) + ':'; // normalize windows drive letter
-            }
-
-            url.path.push(buffer);
-          }
-
-          buffer = '';
-
-          if (url.scheme == 'file' && (char == EOF$1 || char == '?' || char == '#')) {
-            while (url.path.length > 1 && url.path[0] === '') {
-              url.path.shift();
-            }
-          }
-
-          if (char == '?') {
-            url.query = '';
-            state = QUERY$1;
-          } else if (char == '#') {
-            url.fragment = '';
-            state = FRAGMENT$1;
-          }
-        } else {
-          buffer += percentEncode$1(char, pathPercentEncodeSet$1);
-        }
-
-        break;
-
-      case CANNOT_BE_A_BASE_URL_PATH$1:
-        if (char == '?') {
-          url.query = '';
-          state = QUERY$1;
-        } else if (char == '#') {
-          url.fragment = '';
-          state = FRAGMENT$1;
-        } else if (char != EOF$1) {
-          url.path[0] += percentEncode$1(char, C0ControlPercentEncodeSet$1);
-        }
-
-        break;
-
-      case QUERY$1:
-        if (!stateOverride && char == '#') {
-          url.fragment = '';
-          state = FRAGMENT$1;
-        } else if (char != EOF$1) {
-          if (char == "'" && isSpecial(url)) url.query += '%27';else if (char == '#') url.query += '%23';else url.query += percentEncode$1(char, C0ControlPercentEncodeSet$1);
-        }
-
-        break;
-
-      case FRAGMENT$1:
-        if (char != EOF$1) url.fragment += percentEncode$1(char, fragmentPercentEncodeSet$1);
-        break;
-    }
-
-    pointer++;
-  }
-}; // `URL` constructor
-// https://url.spec.whatwg.org/#url-class
-
-
-var URLConstructor$1 = function URL(url
-/* , base */
-) {
-  var that = anInstance$1(this, URLConstructor$1, 'URL');
-  var base = arguments.length > 1 ? arguments[1] : undefined;
-  var urlString = String(url);
-  var state = setInternalState$9(that, {
-    type: 'URL'
-  });
-  var baseState, failure;
-
-  if (base !== undefined) {
-    if (base instanceof URLConstructor$1) baseState = getInternalURLState$1(base);else {
-      failure = parseURL(baseState = {}, String(base));
-      if (failure) throw TypeError(failure);
-    }
-  }
-
-  failure = parseURL(state, urlString, null, baseState);
-  if (failure) throw TypeError(failure);
-  var searchParams = state.searchParams = new URLSearchParams$1$1();
-  var searchParamsState = getInternalSearchParamsState$1(searchParams);
-  searchParamsState.updateSearchParams(state.query);
-
-  searchParamsState.updateURL = function () {
-    state.query = String(searchParams) || null;
-  };
-
-  if (!descriptors$2) {
-    that.href = serializeURL.call(that);
-    that.origin = getOrigin.call(that);
-    that.protocol = getProtocol.call(that);
-    that.username = getUsername.call(that);
-    that.password = getPassword.call(that);
-    that.host = getHost$1.call(that);
-    that.hostname = getHostname.call(that);
-    that.port = getPort.call(that);
-    that.pathname = getPathname.call(that);
-    that.search = getSearch.call(that);
-    that.searchParams = getSearchParams.call(that);
-    that.hash = getHash.call(that);
-  }
-};
-
-var URLPrototype$1 = URLConstructor$1.prototype;
-
-var serializeURL = function serializeURL() {
-  var url = getInternalURLState$1(this);
-  var scheme = url.scheme;
-  var username = url.username;
-  var password = url.password;
-  var host = url.host;
-  var port = url.port;
-  var path = url.path;
-  var query = url.query;
-  var fragment = url.fragment;
-  var output = scheme + ':';
-
-  if (host !== null) {
-    output += '//';
-
-    if (includesCredentials(url)) {
-      output += username + (password ? ':' + password : '') + '@';
-    }
-
-    output += serializeHost$1(host);
-    if (port !== null) output += ':' + port;
-  } else if (scheme == 'file') output += '//';
-
-  output += url.cannotBeABaseURL ? path[0] : path.length ? '/' + path.join('/') : '';
-  if (query !== null) output += '?' + query;
-  if (fragment !== null) output += '#' + fragment;
-  return output;
-};
-
-var getOrigin = function getOrigin() {
-  var url = getInternalURLState$1(this);
-  var scheme = url.scheme;
-  var port = url.port;
-  if (scheme == 'blob') try {
-    return new URL(scheme.path[0]).origin;
-  } catch (error) {
-    return 'null';
-  }
-  if (scheme == 'file' || !isSpecial(url)) return 'null';
-  return scheme + '://' + serializeHost$1(url.host) + (port !== null ? ':' + port : '');
-};
-
-var getProtocol = function getProtocol() {
-  return getInternalURLState$1(this).scheme + ':';
-};
-
-var getUsername = function getUsername() {
-  return getInternalURLState$1(this).username;
-};
-
-var getPassword = function getPassword() {
-  return getInternalURLState$1(this).password;
-};
-
-var getHost$1 = function getHost$1() {
-  var url = getInternalURLState$1(this);
-  var host = url.host;
-  var port = url.port;
-  return host === null ? '' : port === null ? serializeHost$1(host) : serializeHost$1(host) + ':' + port;
-};
-
-var getHostname = function getHostname() {
-  var host = getInternalURLState$1(this).host;
-  return host === null ? '' : serializeHost$1(host);
-};
-
-var getPort = function getPort() {
-  var port = getInternalURLState$1(this).port;
-  return port === null ? '' : String(port);
-};
-
-var getPathname = function getPathname() {
-  var url = getInternalURLState$1(this);
-  var path = url.path;
-  return url.cannotBeABaseURL ? path[0] : path.length ? '/' + path.join('/') : '';
-};
-
-var getSearch = function getSearch() {
-  var query = getInternalURLState$1(this).query;
-  return query ? '?' + query : '';
-};
-
-var getSearchParams = function getSearchParams() {
-  return getInternalURLState$1(this).searchParams;
-};
-
-var getHash = function getHash() {
-  var fragment = getInternalURLState$1(this).fragment;
-  return fragment ? '#' + fragment : '';
-};
-
-var accessorDescriptor$1 = function accessorDescriptor(getter, setter) {
-  return {
-    get: getter,
-    set: setter,
-    configurable: true,
-    enumerable: true
-  };
-};
-
-if (descriptors$2) {
-  objectDefineProperties$2(URLPrototype$1, {
-    // `URL.prototype.href` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-href
-    href: accessorDescriptor$1(serializeURL, function (href) {
-      var url = getInternalURLState$1(this);
-      var urlString = String(href);
-      var failure = parseURL(url, urlString);
-      if (failure) throw TypeError(failure);
-      getInternalSearchParamsState$1(url.searchParams).updateSearchParams(url.query);
-    }),
-    // `URL.prototype.origin` getter
-    // https://url.spec.whatwg.org/#dom-url-origin
-    origin: accessorDescriptor$1(getOrigin),
-    // `URL.prototype.protocol` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-protocol
-    protocol: accessorDescriptor$1(getProtocol, function (protocol) {
-      var url = getInternalURLState$1(this);
-      parseURL(url, String(protocol) + ':', SCHEME_START$1);
-    }),
-    // `URL.prototype.username` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-username
-    username: accessorDescriptor$1(getUsername, function (username) {
-      var url = getInternalURLState$1(this);
-      var codePoints = arrayFrom$2(String(username));
-      if (cannotHaveUsernamePasswordPort(url)) return;
-      url.username = '';
-
-      for (var i = 0; i < codePoints.length; i++) {
-        url.username += percentEncode$1(codePoints[i], userinfoPercentEncodeSet$1);
-      }
-    }),
-    // `URL.prototype.password` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-password
-    password: accessorDescriptor$1(getPassword, function (password) {
-      var url = getInternalURLState$1(this);
-      var codePoints = arrayFrom$2(String(password));
-      if (cannotHaveUsernamePasswordPort(url)) return;
-      url.password = '';
-
-      for (var i = 0; i < codePoints.length; i++) {
-        url.password += percentEncode$1(codePoints[i], userinfoPercentEncodeSet$1);
-      }
-    }),
-    // `URL.prototype.host` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-host
-    host: accessorDescriptor$1(getHost$1, function (host) {
-      var url = getInternalURLState$1(this);
-      if (url.cannotBeABaseURL) return;
-      parseURL(url, String(host), HOST$1);
-    }),
-    // `URL.prototype.hostname` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-hostname
-    hostname: accessorDescriptor$1(getHostname, function (hostname) {
-      var url = getInternalURLState$1(this);
-      if (url.cannotBeABaseURL) return;
-      parseURL(url, String(hostname), HOSTNAME$1);
-    }),
-    // `URL.prototype.port` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-port
-    port: accessorDescriptor$1(getPort, function (port) {
-      var url = getInternalURLState$1(this);
-      if (cannotHaveUsernamePasswordPort(url)) return;
-      port = String(port);
-      if (port == '') url.port = null;else parseURL(url, port, PORT$1);
-    }),
-    // `URL.prototype.pathname` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-pathname
-    pathname: accessorDescriptor$1(getPathname, function (pathname) {
-      var url = getInternalURLState$1(this);
-      if (url.cannotBeABaseURL) return;
-      url.path = [];
-      parseURL(url, pathname + '', PATH_START$1);
-    }),
-    // `URL.prototype.search` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-search
-    search: accessorDescriptor$1(getSearch, function (search) {
-      var url = getInternalURLState$1(this);
-      search = String(search);
-
-      if (search == '') {
-        url.query = null;
-      } else {
-        if ('?' == search.charAt(0)) search = search.slice(1);
-        url.query = '';
-        parseURL(url, search, QUERY$1);
-      }
-
-      getInternalSearchParamsState$1(url.searchParams).updateSearchParams(url.query);
-    }),
-    // `URL.prototype.searchParams` getter
-    // https://url.spec.whatwg.org/#dom-url-searchparams
-    searchParams: accessorDescriptor$1(getSearchParams),
-    // `URL.prototype.hash` accessors pair
-    // https://url.spec.whatwg.org/#dom-url-hash
-    hash: accessorDescriptor$1(getHash, function (hash) {
-      var url = getInternalURLState$1(this);
-      hash = String(hash);
-
-      if (hash == '') {
-        url.fragment = null;
-        return;
-      }
-
-      if ('#' == hash.charAt(0)) hash = hash.slice(1);
-      url.fragment = '';
-      parseURL(url, hash, FRAGMENT$1);
-    })
-  });
-} // `URL.prototype.toJSON` method
-// https://url.spec.whatwg.org/#dom-url-tojson
-
-
-redefine$1(URLPrototype$1, 'toJSON', function toJSON() {
-  return serializeURL.call(this);
-}, {
-  enumerable: true
-}); // `URL.prototype.toString` method
-// https://url.spec.whatwg.org/#URL-stringification-behavior
-
-redefine$1(URLPrototype$1, 'toString', function toString() {
-  return serializeURL.call(this);
-}, {
-  enumerable: true
-});
-
-if (NativeURL$1) {
-  var nativeCreateObjectURL$1 = NativeURL$1.createObjectURL;
-  var nativeRevokeObjectURL$1 = NativeURL$1.revokeObjectURL; // `URL.createObjectURL` method
-  // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
-  // eslint-disable-next-line no-unused-vars -- required for `.length`
-
-  if (nativeCreateObjectURL$1) redefine$1(URLConstructor$1, 'createObjectURL', function createObjectURL(blob) {
-    return nativeCreateObjectURL$1.apply(NativeURL$1, arguments);
-  }); // `URL.revokeObjectURL` method
-  // https://developer.mozilla.org/en-US/docs/Web/API/URL/revokeObjectURL
-  // eslint-disable-next-line no-unused-vars -- required for `.length`
-
-  if (nativeRevokeObjectURL$1) redefine$1(URLConstructor$1, 'revokeObjectURL', function revokeObjectURL(url) {
-    return nativeRevokeObjectURL$1.apply(NativeURL$1, arguments);
-  });
-}
-
-setToStringTag$2(URLConstructor$1, 'URL');
-
-_export$2({
-  global: true,
-  forced: !nativeUrl$1,
-  sham: !descriptors$2
-}, {
-  URL: URLConstructor$1
-});
 
 (function (global) {
   /**
@@ -12460,7 +8996,7 @@ var isNullOrUndefined = function isNullOrUndefined(input) {
   return input === null || typeof input === 'undefined';
 };
 
-var isObject$3 = function isObject(input) {
+var isObject$2 = function isObject(input) {
   return getConstructor(input) === Object;
 };
 
@@ -12521,7 +9057,7 @@ var isElement = function isElement(input) {
 };
 
 var isEmpty = function isEmpty(input) {
-  return isNullOrUndefined(input) || (isString(input) || isArray$2(input) || isNodeList(input)) && !input.length || isObject$3(input) && !Object.keys(input).length;
+  return isNullOrUndefined(input) || (isString(input) || isArray$2(input) || isNodeList(input)) && !input.length || isObject$2(input) && !Object.keys(input).length;
 };
 
 var isUrl = function isUrl(input) {
@@ -12544,14 +9080,14 @@ var isUrl = function isUrl(input) {
 
   try {
     return !isEmpty(new URL(string).hostname);
-  } catch (e) {
+  } catch (_) {
     return false;
   }
 };
 
 var is = {
   nullOrUndefined: isNullOrUndefined,
-  object: isObject$3,
+  object: isObject$2,
   number: isNumber,
   string: isString,
   boolean: isBoolean,
@@ -12594,7 +9130,7 @@ function repaint(element, delay) {
       element.offsetHeight; // eslint-disable-next-line no-param-reassign
 
       element.hidden = false;
-    } catch (e) {// Do nothing
+    } catch (_) {// Do nothing
     }
   }, delay);
 } // ==========================================================================
@@ -12608,7 +9144,7 @@ var browser = {
   isEdge: window.navigator.userAgent.includes('Edge'),
   isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
   isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
-  isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
+  isIos: navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 || /(iPad|iPhone|iPod)/gi.test(navigator.platform)
 }; // ==========================================================================
 
 function cloneDeep(object) {
@@ -12652,7 +9188,8 @@ function extend() {
     }
   });
   return extend.apply(void 0, [target].concat(sources));
-}
+} // ==========================================================================
+
 
 function wrap$2(elements, wrapper) {
   // Convert `elements` to an array, if necessary.
@@ -12929,7 +9466,8 @@ function setFocus() {
   if (tabFocus) {
     toggleClass(element, this.config.classNames.tabFocus);
   }
-}
+} // ==========================================================================
+
 
 var defaultCodecs = {
   'audio/ogg': 'vorbis',
@@ -13006,7 +9544,7 @@ var support = {
 
     try {
       return Boolean(type && this.media.canPlayType(type).replace(/no/, ''));
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   },
@@ -13043,7 +9581,7 @@ var supportsPassiveListeners = function () {
     });
     window.addEventListener('test', null, options);
     window.removeEventListener('test', null, options);
-  } catch (e) {// Do nothing
+  } catch (_) {// Do nothing
   }
 
   return supported;
@@ -13214,6 +9752,15 @@ function closest(array, value) {
 } // ==========================================================================
 
 
+function supportsCSS(declaration) {
+  if (!window || !window.CSS) {
+    return false;
+  }
+
+  return window.CSS.supports(declaration);
+} // Standard/common aspect ratios
+
+
 var standardRatios = [[1, 1], [4, 3], [3, 4], [5, 4], [4, 5], [3, 2], [2, 3], [16, 10], [10, 16], [16, 9], [9, 16], [21, 9], [9, 21], [32, 9], [9, 32]].reduce(function (out, _ref5) {
   var _ref6 = _slicedToArray(_ref5, 2),
       x = _ref6[0],
@@ -13272,10 +9819,10 @@ function getAspectRatio(input) {
     var _this$media = this.media,
         videoWidth = _this$media.videoWidth,
         videoHeight = _this$media.videoHeight;
-    ratio = reduceAspectRatio([videoWidth, videoHeight]);
+    ratio = [videoWidth, videoHeight];
   }
 
-  return ratio;
+  return reduceAspectRatio(ratio);
 } // Set aspect ratio for responsive container
 
 
@@ -13291,11 +9838,12 @@ function setAspectRatio(input) {
     return {};
   }
 
-  var _ratio2 = _slicedToArray(ratio, 2),
-      x = _ratio2[0],
-      y = _ratio2[1];
+  var _reduceAspectRatio = reduceAspectRatio(ratio),
+      _reduceAspectRatio2 = _slicedToArray(_reduceAspectRatio, 2),
+      x = _reduceAspectRatio2[0],
+      y = _reduceAspectRatio2[1];
 
-  var useNative = window.CSS ? window.CSS.supports("aspect-ratio: ".concat(x, "/").concat(y)) : false;
+  var useNative = supportsCSS("aspect-ratio: ".concat(x, "/").concat(y));
   var padding = 100 / x * y;
 
   if (useNative) {
@@ -13315,7 +9863,7 @@ function setAspectRatio(input) {
       this.media.style.transform = "translateY(-".concat(offset, "%)");
     }
   } else if (this.isHTML5) {
-    wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
+    wrapper.classList.add(this.config.classNames.videoFixedRatio);
   }
 
   return {
@@ -13336,6 +9884,14 @@ function roundAspectRatio(x, y) {
 
 
   return [x, y];
+} // Get the size of the viewport
+// https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions
+
+
+function getViewportSize() {
+  var width = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+  var height = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+  return [width, height];
 } // ==========================================================================
 
 
@@ -13398,7 +9954,7 @@ var html5 = {
       set: function set(input) {
         if (player.quality === input) {
           return;
-        } // If we're using an an external handler...
+        } // If we're using an external handler...
 
 
         if (player.config.quality.forced && is.function(player.config.quality.onChange)) {
@@ -13468,7 +10024,7 @@ var html5 = {
 
     this.debug.log('Cancelled network requests');
   }
-};
+}; // ==========================================================================
 
 function generateId(prefix) {
   return "".concat(prefix, "-").concat(Math.floor(Math.random() * 10000));
@@ -13480,10 +10036,7 @@ function format(input) {
     args[_key3 - 1] = arguments[_key3];
   }
 
-  if (is.empty(input)) {
-    return input;
-  }
-
+  if (is.empty(input)) return input;
   return input.toString().replace(/{(\d+)}/g, function (match, i) {
     return args[i].toString();
   });
@@ -13496,7 +10049,7 @@ function getPercentage(current, max) {
   }
 
   return (current / max * 100).toFixed(2);
-} // Replace all occurances of a string in a string
+} // Replace all occurrences of a string in a string
 
 
 var replaceAll = function replaceAll() {
@@ -13510,7 +10063,7 @@ var replaceAll = function replaceAll() {
 var toTitleCase = function toTitleCase() {
   var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
   return input.toString().replace(/\w\S*/g, function (text) {
-    return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   });
 }; // Convert string to pascalCase
 
@@ -13639,7 +10192,10 @@ var Storage = /*#__PURE__*/function () {
 
       extend(storage, object); // Update storage
 
-      window.localStorage.setItem(_this6.key, JSON.stringify(storage));
+      try {
+        window.localStorage.setItem(_this6.key, JSON.stringify(storage));
+      } catch (_) {// Do nothing
+      }
     });
 
     this.enabled = player.config.storage.enabled;
@@ -13655,13 +10211,13 @@ var Storage = /*#__PURE__*/function () {
           return false;
         }
 
-        var _test = '___test'; // Try to use it (it might be disabled, e.g. user is in private mode)
+        var test = '___test'; // Try to use it (it might be disabled, e.g. user is in private mode)
         // see: https://github.com/sampotts/plyr/issues/131
 
-        window.localStorage.setItem(_test, _test);
-        window.localStorage.removeItem(_test);
+        window.localStorage.setItem(test, test);
+        window.localStorage.removeItem(test);
         return true;
-      } catch (e) {
+      } catch (_) {
         return false;
       }
     }
@@ -13688,7 +10244,7 @@ function fetch(url) {
         if (responseType === 'text') {
           try {
             resolve(JSON.parse(request.responseText));
-          } catch (e) {
+          } catch (_) {
             resolve(request.responseText);
           }
         } else {
@@ -13702,8 +10258,8 @@ function fetch(url) {
 
       request.responseType = responseType;
       request.send();
-    } catch (e) {
-      reject(e);
+    } catch (error) {
+      reject(error);
     }
   });
 } // ==========================================================================
@@ -13751,9 +10307,8 @@ function _loadSprite(url, id) {
       isCached = cached !== null;
 
       if (isCached) {
-        var _data = JSON.parse(cached);
-
-        update(container, _data.content);
+        var data = JSON.parse(cached);
+        update(container, data.content);
       }
     } // Get the sprite
 
@@ -13764,9 +10319,12 @@ function _loadSprite(url, id) {
       }
 
       if (useStorage) {
-        window.localStorage.setItem("".concat(prefix, "-").concat(id), JSON.stringify({
-          content: result
-        }));
+        try {
+          window.localStorage.setItem("".concat(prefix, "-").concat(id), JSON.stringify({
+            content: result
+          }));
+        } catch (_) {// Do nothing
+        }
       }
 
       update(container, result);
@@ -13816,13 +10374,15 @@ function _formatTime() {
 
 
   return "".concat(inverted && time > 0 ? '-' : '').concat(hours).concat(format(mins), ":").concat(format(secs));
-}
+} // ==========================================================================
+
 
 var controls = {
   // Get icon URL
   getIconUrl: function getIconUrl() {
     var url = new URL(this.config.iconUrl, window.location);
-    var cors = url.host !== window.location.host || browser.isIE && !window.svg4everybody;
+    var host = window.location.host ? window.location.host : window.top.location.host;
+    var cors = url.host !== host || browser.isIE && !window.svg4everybody;
     return {
       url: this.config.iconUrl,
       cors: cors
@@ -14120,7 +10680,7 @@ var controls = {
     // Navigate through menus via arrow keys and space
     on.call(this, menuItem, 'keydown keyup', function (event) {
       // We only care about space and ⬆️ ⬇️️ ➡️
-      if (![32, 38, 39, 40].includes(event.which)) {
+      if (!['Space', 'ArrowUp', 'ArrowDown', 'ArrowRight'].includes(event.key)) {
         return;
       } // Prevent play / seek
 
@@ -14134,13 +10694,13 @@ var controls = {
 
       var isRadioButton = matches(menuItem, '[role="menuitemradio"]'); // Show the respective menu
 
-      if (!isRadioButton && [32, 39].includes(event.which)) {
+      if (!isRadioButton && ['Space', 'ArrowRight'].includes(event.key)) {
         controls.showMenuPanel.call(_this8, type, true);
       } else {
         var target;
 
-        if (event.which !== 32) {
-          if (event.which === 40 || isRadioButton && event.which === 39) {
+        if (event.key !== 'Space') {
+          if (event.key === 'ArrowDown' || isRadioButton && event.key === 'ArrowRight') {
             target = menuItem.nextElementSibling;
 
             if (!is.element(target)) {
@@ -14161,10 +10721,7 @@ var controls = {
     // So we bind to keyup which fires after and set focus here
 
     on.call(this, menuItem, 'keyup', function (event) {
-      if (event.which !== 13) {
-        return;
-      }
-
+      if (event.key !== 'Return') return;
       controls.focusFirstMenuItem.call(_this8, null, true);
     });
   },
@@ -14196,7 +10753,7 @@ var controls = {
       flex.appendChild(badge);
     }
 
-    menuItem.appendChild(flex); // Replicate radio button behaviour
+    menuItem.appendChild(flex); // Replicate radio button behavior
 
     Object.defineProperty(menuItem, 'checked', {
       enumerable: true,
@@ -14217,7 +10774,7 @@ var controls = {
       }
     });
     this.listeners.bind(menuItem, 'click keyup', function (event) {
-      if (is.keyboardEvent(event) && event.which !== 32) {
+      if (is.keyboardEvent(event) && event.key !== 'Space') {
         return;
       }
 
@@ -14384,17 +10941,18 @@ var controls = {
   },
   // Update hover tooltip for seeking
   updateSeekTooltip: function updateSeekTooltip(event) {
-    var _this11 = this;
+    var _this$config$markers, _this$config$markers$; // Bail if setting not true
 
-    // Bail if setting not true
+
     if (!this.config.tooltips.seek || !is.element(this.elements.inputs.seek) || !is.element(this.elements.display.seekTooltip) || this.duration === 0) {
       return;
     }
 
+    var tipElement = this.elements.display.seekTooltip;
     var visible = "".concat(this.config.classNames.tooltip, "--visible");
 
     var toggle = function toggle(show) {
-      return toggleClass(_this11.elements.display.seekTooltip, visible, show);
+      return toggleClass(tipElement, visible, show);
     }; // Hide on touch
 
 
@@ -14409,8 +10967,8 @@ var controls = {
 
     if (is.event(event)) {
       percent = 100 / clientRect.width * (event.pageX - clientRect.left);
-    } else if (hasClass(this.elements.display.seekTooltip, visible)) {
-      percent = parseFloat(this.elements.display.seekTooltip.style.left, 10);
+    } else if (hasClass(tipElement, visible)) {
+      percent = parseFloat(tipElement.style.left, 10);
     } else {
       return;
     } // Set bounds
@@ -14420,12 +10978,23 @@ var controls = {
       percent = 0;
     } else if (percent > 100) {
       percent = 100;
-    } // Display the time a click would seek to
+    }
+
+    var time = this.duration / 100 * percent; // Display the time a click would seek to
+
+    tipElement.innerText = controls.formatTime(time); // Get marker point for time
+
+    var point = (_this$config$markers = this.config.markers) === null || _this$config$markers === void 0 ? void 0 : (_this$config$markers$ = _this$config$markers.points) === null || _this$config$markers$ === void 0 ? void 0 : _this$config$markers$.find(function (_ref10) {
+      var t = _ref10.time;
+      return t === Math.round(time);
+    }); // Append the point label to the tooltip
+
+    if (point) {
+      tipElement.insertAdjacentHTML('afterbegin', "".concat(point.label, "<br>"));
+    } // Set position
 
 
-    controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, this.duration / 100 * percent); // Set position
-
-    this.elements.display.seekTooltip.style.left = "".concat(percent, "%"); // Show/hide the tooltip
+    tipElement.style.left = "".concat(percent, "%"); // Show/hide the tooltip
     // If the event is a moues in/out and percentage is inside bounds
 
     if (is.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
@@ -14478,6 +11047,10 @@ var controls = {
 
     if (hasDuration) {
       controls.updateTimeDisplay.call(this, this.elements.display.duration, this.duration);
+    }
+
+    if (this.config.markers.enabled) {
+      controls.setMarkers.call(this);
     } // Update the tooltip (if visible)
 
 
@@ -14563,7 +11136,7 @@ var controls = {
   },
   // Set the quality menu
   setQualityMenu: function setQualityMenu(options) {
-    var _this12 = this;
+    var _this11 = this;
 
     // Menu required
     if (!is.element(this.elements.settings.panels.quality)) {
@@ -14575,7 +11148,7 @@ var controls = {
 
     if (is.array(options)) {
       this.options.quality = dedupe(options).filter(function (quality) {
-        return _this12.config.quality.options.includes(quality);
+        return _this11.config.quality.options.includes(quality);
       });
     } // Toggle the pane and tab
 
@@ -14593,25 +11166,25 @@ var controls = {
 
 
     var getBadge = function getBadge(quality) {
-      var label = i18n.get("qualityBadge.".concat(quality), _this12.config);
+      var label = i18n.get("qualityBadge.".concat(quality), _this11.config);
 
       if (!label.length) {
         return null;
       }
 
-      return controls.createBadge.call(_this12, label);
+      return controls.createBadge.call(_this11, label);
     }; // Sort options by the config and then render options
 
 
     this.options.quality.sort(function (a, b) {
-      var sorting = _this12.config.quality.options;
+      var sorting = _this11.config.quality.options;
       return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
     }).forEach(function (quality) {
-      controls.createMenuItem.call(_this12, {
+      controls.createMenuItem.call(_this11, {
         value: quality,
         list: list,
         type: type,
-        title: controls.getLabel.call(_this12, 'quality', quality),
+        title: controls.getLabel.call(_this11, 'quality', quality),
         badge: getBadge(quality)
       });
     });
@@ -14657,7 +11230,7 @@ var controls = {
   // TODO: rework this to user the getter in the API?
   // Set a list of available captions languages
   setCaptionsMenu: function setCaptionsMenu() {
-    var _this13 = this;
+    var _this12 = this;
 
     // Menu required
     if (!is.element(this.elements.settings.panels.captions)) {
@@ -14684,9 +11257,9 @@ var controls = {
     var options = tracks.map(function (track, value) {
       return {
         value: value,
-        checked: _this13.captions.toggled && _this13.currentTrack === value,
-        title: captions.getLabel.call(_this13, track),
-        badge: track.language && controls.createBadge.call(_this13, track.language.toUpperCase()),
+        checked: _this12.captions.toggled && _this12.currentTrack === value,
+        title: captions.getLabel.call(_this12, track),
+        badge: track.language && controls.createBadge.call(_this12, track.language.toUpperCase()),
         list: list,
         type: 'language'
       };
@@ -14705,7 +11278,7 @@ var controls = {
   },
   // Set a list of available captions languages
   setSpeedMenu: function setSpeedMenu() {
-    var _this14 = this;
+    var _this13 = this;
 
     // Menu required
     if (!is.element(this.elements.settings.panels.speed)) {
@@ -14716,7 +11289,7 @@ var controls = {
     var list = this.elements.settings.panels.speed.querySelector('[role="menu"]'); // Filter out invalid speeds
 
     this.options.speed = this.options.speed.filter(function (o) {
-      return o >= _this14.minimumSpeed && o <= _this14.maximumSpeed;
+      return o >= _this13.minimumSpeed && o <= _this13.maximumSpeed;
     }); // Toggle the pane and tab
 
     var toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
@@ -14732,11 +11305,11 @@ var controls = {
 
 
     this.options.speed.forEach(function (speed) {
-      controls.createMenuItem.call(_this14, {
+      controls.createMenuItem.call(_this13, {
         value: speed,
         list: list,
         type: type,
-        title: controls.getLabel.call(_this14, 'speed', speed)
+        title: controls.getLabel.call(_this13, 'speed', speed)
       });
     });
     controls.updateSetting.call(this, type, list);
@@ -14783,7 +11356,7 @@ var controls = {
 
     if (is.boolean(input)) {
       show = input;
-    } else if (is.keyboardEvent(input) && input.which === 27) {
+    } else if (is.keyboardEvent(input) && input.key === 'Escape') {
       show = false;
     } else if (is.event(input)) {
       // If Plyr is in a shadowDOM, the event target is set to the component, instead of the
@@ -14832,7 +11405,7 @@ var controls = {
   },
   // Show a panel in the menu
   showMenuPanel: function showMenuPanel() {
-    var _this15 = this;
+    var _this14 = this;
 
     var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     var tabFocus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -14865,7 +11438,7 @@ var controls = {
         container.style.width = '';
         container.style.height = ''; // Only listen once
 
-        off.call(_this15, container, transitionEndEvent, restore);
+        off.call(_this14, container, transitionEndEvent, restore);
       }; // Listen for the transition finishing and restore auto height/width
 
 
@@ -14895,7 +11468,7 @@ var controls = {
   },
   // Build the default HTML
   create: function create(data) {
-    var _this16 = this;
+    var _this15 = this;
 
     var bindMenuItemShortcuts = controls.bindMenuItemShortcuts,
         createButton = controls.createButton,
@@ -14922,22 +11495,22 @@ var controls = {
     dedupe(is.array(this.config.controls) ? this.config.controls : []).forEach(function (control) {
       // Restart button
       if (control === 'restart') {
-        container.appendChild(createButton.call(_this16, 'restart', defaultAttributes));
+        container.appendChild(createButton.call(_this15, 'restart', defaultAttributes));
       } // Rewind button
 
 
       if (control === 'rewind') {
-        container.appendChild(createButton.call(_this16, 'rewind', defaultAttributes));
+        container.appendChild(createButton.call(_this15, 'rewind', defaultAttributes));
       } // Play/Pause button
 
 
       if (control === 'play') {
-        container.appendChild(createButton.call(_this16, 'play', defaultAttributes));
+        container.appendChild(createButton.call(_this15, 'play', defaultAttributes));
       } // Fast forward button
 
 
       if (control === 'fast-forward') {
-        container.appendChild(createButton.call(_this16, 'fast-forward', defaultAttributes));
+        container.appendChild(createButton.call(_this15, 'fast-forward', defaultAttributes));
       } // Progress
 
 
@@ -14945,53 +11518,53 @@ var controls = {
         var progressContainer = createElement('div', {
           class: "".concat(defaultAttributes.class, " plyr__progress__container")
         });
-        var progress = createElement('div', getAttributesFromSelector(_this16.config.selectors.progress)); // Seek range slider
+        var progress = createElement('div', getAttributesFromSelector(_this15.config.selectors.progress)); // Seek range slider
 
-        progress.appendChild(createRange.call(_this16, 'seek', {
+        progress.appendChild(createRange.call(_this15, 'seek', {
           id: "plyr-seek-".concat(data.id)
         })); // Buffer progress
 
-        progress.appendChild(createProgress.call(_this16, 'buffer')); // TODO: Add loop display indicator
+        progress.appendChild(createProgress.call(_this15, 'buffer')); // TODO: Add loop display indicator
         // Seek tooltip
 
-        if (_this16.config.tooltips.seek) {
+        if (_this15.config.tooltips.seek) {
           var tooltip = createElement('span', {
-            class: _this16.config.classNames.tooltip
+            class: _this15.config.classNames.tooltip
           }, '00:00');
           progress.appendChild(tooltip);
-          _this16.elements.display.seekTooltip = tooltip;
+          _this15.elements.display.seekTooltip = tooltip;
         }
 
-        _this16.elements.progress = progress;
-        progressContainer.appendChild(_this16.elements.progress);
+        _this15.elements.progress = progress;
+        progressContainer.appendChild(_this15.elements.progress);
         container.appendChild(progressContainer);
       } // Media current time display
 
 
       if (control === 'current-time') {
-        container.appendChild(createTime.call(_this16, 'currentTime', defaultAttributes));
+        container.appendChild(createTime.call(_this15, 'currentTime', defaultAttributes));
       } // Media duration display
 
 
       if (control === 'duration') {
-        container.appendChild(createTime.call(_this16, 'duration', defaultAttributes));
+        container.appendChild(createTime.call(_this15, 'duration', defaultAttributes));
       } // Volume controls
 
 
       if (control === 'mute' || control === 'volume') {
-        var volume = _this16.elements.volume; // Create the volume container if needed
+        var volume = _this15.elements.volume; // Create the volume container if needed
 
         if (!is.element(volume) || !container.contains(volume)) {
           volume = createElement('div', extend({}, defaultAttributes, {
             class: "".concat(defaultAttributes.class, " plyr__volume").trim()
           }));
-          _this16.elements.volume = volume;
+          _this15.elements.volume = volume;
           container.appendChild(volume);
         } // Toggle mute button
 
 
         if (control === 'mute') {
-          volume.appendChild(createButton.call(_this16, 'mute'));
+          volume.appendChild(createButton.call(_this15, 'mute'));
         } // Volume range control
         // Ignored on iOS as it's handled globally
         // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
@@ -15002,10 +11575,10 @@ var controls = {
           var attributes = {
             max: 1,
             step: 0.05,
-            value: _this16.config.volume
+            value: _this15.config.volume
           }; // Create the volume range slider
 
-          volume.appendChild(createRange.call(_this16, 'volume', extend(attributes, {
+          volume.appendChild(createRange.call(_this15, 'volume', extend(attributes, {
             id: "plyr-volume-".concat(data.id)
           })));
         }
@@ -15013,16 +11586,16 @@ var controls = {
 
 
       if (control === 'captions') {
-        container.appendChild(createButton.call(_this16, 'captions', defaultAttributes));
+        container.appendChild(createButton.call(_this15, 'captions', defaultAttributes));
       } // Settings button / menu
 
 
-      if (control === 'settings' && !is.empty(_this16.config.settings)) {
+      if (control === 'settings' && !is.empty(_this15.config.settings)) {
         var wrapper = createElement('div', extend({}, defaultAttributes, {
           class: "".concat(defaultAttributes.class, " plyr__menu").trim(),
           hidden: ''
         }));
-        wrapper.appendChild(createButton.call(_this16, 'settings', {
+        wrapper.appendChild(createButton.call(_this15, 'settings', {
           'aria-haspopup': true,
           'aria-controls': "plyr-settings-".concat(data.id),
           'aria-expanded': false
@@ -15042,26 +11615,26 @@ var controls = {
         });
         home.appendChild(menu);
         inner.appendChild(home);
-        _this16.elements.settings.panels.home = home; // Build the menu items
+        _this15.elements.settings.panels.home = home; // Build the menu items
 
-        _this16.config.settings.forEach(function (type) {
+        _this15.config.settings.forEach(function (type) {
           // TODO: bundle this with the createMenuItem helper and bindings
-          var menuItem = createElement('button', extend(getAttributesFromSelector(_this16.config.selectors.buttons.settings), {
+          var menuItem = createElement('button', extend(getAttributesFromSelector(_this15.config.selectors.buttons.settings), {
             type: 'button',
-            class: "".concat(_this16.config.classNames.control, " ").concat(_this16.config.classNames.control, "--forward"),
+            class: "".concat(_this15.config.classNames.control, " ").concat(_this15.config.classNames.control, "--forward"),
             role: 'menuitem',
             'aria-haspopup': true,
             hidden: ''
           })); // Bind menu shortcuts for keyboard users
 
-          bindMenuItemShortcuts.call(_this16, menuItem, type); // Show menu on click
+          bindMenuItemShortcuts.call(_this15, menuItem, type); // Show menu on click
 
-          on.call(_this16, menuItem, 'click', function () {
-            showMenuPanel.call(_this16, type, false);
+          on.call(_this15, menuItem, 'click', function () {
+            showMenuPanel.call(_this15, type, false);
           });
-          var flex = createElement('span', null, i18n.get(type, _this16.config));
+          var flex = createElement('span', null, i18n.get(type, _this15.config));
           var value = createElement('span', {
-            class: _this16.config.classNames.menu.value
+            class: _this15.config.classNames.menu.value
           }); // Speed contains HTML entities
 
           value.innerHTML = data[type];
@@ -15076,32 +11649,28 @@ var controls = {
 
           var backButton = createElement('button', {
             type: 'button',
-            class: "".concat(_this16.config.classNames.control, " ").concat(_this16.config.classNames.control, "--back")
+            class: "".concat(_this15.config.classNames.control, " ").concat(_this15.config.classNames.control, "--back")
           }); // Visible label
 
           backButton.appendChild(createElement('span', {
             'aria-hidden': true
-          }, i18n.get(type, _this16.config))); // Screen reader label
+          }, i18n.get(type, _this15.config))); // Screen reader label
 
           backButton.appendChild(createElement('span', {
-            class: _this16.config.classNames.hidden
-          }, i18n.get('menuBack', _this16.config))); // Go back via keyboard
+            class: _this15.config.classNames.hidden
+          }, i18n.get('menuBack', _this15.config))); // Go back via keyboard
 
-          on.call(_this16, pane, 'keydown', function (event) {
-            // We only care about <-
-            if (event.which !== 37) {
-              return;
-            } // Prevent seek
-
+          on.call(_this15, pane, 'keydown', function (event) {
+            if (event.key !== 'ArrowLeft') return; // Prevent seek
 
             event.preventDefault();
             event.stopPropagation(); // Show the respective menu
 
-            showMenuPanel.call(_this16, 'home', true);
+            showMenuPanel.call(_this15, 'home', true);
           }, false); // Go back via button click
 
-          on.call(_this16, backButton, 'click', function () {
-            showMenuPanel.call(_this16, 'home', false);
+          on.call(_this15, backButton, 'click', function () {
+            showMenuPanel.call(_this15, 'home', false);
           }); // Add to pane
 
           pane.appendChild(backButton); // Menu
@@ -15110,55 +11679,55 @@ var controls = {
             role: 'menu'
           }));
           inner.appendChild(pane);
-          _this16.elements.settings.buttons[type] = menuItem;
-          _this16.elements.settings.panels[type] = pane;
+          _this15.elements.settings.buttons[type] = menuItem;
+          _this15.elements.settings.panels[type] = pane;
         });
 
         popup.appendChild(inner);
         wrapper.appendChild(popup);
         container.appendChild(wrapper);
-        _this16.elements.settings.popup = popup;
-        _this16.elements.settings.menu = wrapper;
+        _this15.elements.settings.popup = popup;
+        _this15.elements.settings.menu = wrapper;
       } // Picture in picture button
 
 
       if (control === 'pip' && support.pip) {
-        container.appendChild(createButton.call(_this16, 'pip', defaultAttributes));
+        container.appendChild(createButton.call(_this15, 'pip', defaultAttributes));
       } // Airplay button
 
 
       if (control === 'airplay' && support.airplay) {
-        container.appendChild(createButton.call(_this16, 'airplay', defaultAttributes));
+        container.appendChild(createButton.call(_this15, 'airplay', defaultAttributes));
       } // Download button
 
 
       if (control === 'download') {
         var _attributes = extend({}, defaultAttributes, {
           element: 'a',
-          href: _this16.download,
+          href: _this15.download,
           target: '_blank'
         }); // Set download attribute for HTML5 only
 
 
-        if (_this16.isHTML5) {
+        if (_this15.isHTML5) {
           _attributes.download = '';
         }
 
-        var download = _this16.config.urls.download;
+        var download = _this15.config.urls.download;
 
-        if (!is.url(download) && _this16.isEmbed) {
+        if (!is.url(download) && _this15.isEmbed) {
           extend(_attributes, {
-            icon: "logo-".concat(_this16.provider),
-            label: _this16.provider
+            icon: "logo-".concat(_this15.provider),
+            label: _this15.provider
           });
         }
 
-        container.appendChild(createButton.call(_this16, 'download', _attributes));
+        container.appendChild(createButton.call(_this15, 'download', _attributes));
       } // Toggle fullscreen button
 
 
       if (control === 'fullscreen') {
-        container.appendChild(createButton.call(_this16, 'fullscreen', defaultAttributes));
+        container.appendChild(createButton.call(_this15, 'fullscreen', defaultAttributes));
       }
     }); // Set available quality levels
 
@@ -15171,7 +11740,7 @@ var controls = {
   },
   // Insert controls
   inject: function inject() {
-    var _this17 = this;
+    var _this16 = this;
 
     // Sprite
     if (this.config.loadSprite) {
@@ -15224,10 +11793,10 @@ var controls = {
 
     var replace = function replace(input) {
       var result = input;
-      Object.entries(props).forEach(function (_ref10) {
-        var _ref11 = _slicedToArray(_ref10, 2),
-            key = _ref11[0],
-            value = _ref11[1];
+      Object.entries(props).forEach(function (_ref11) {
+        var _ref12 = _slicedToArray(_ref11, 2),
+            key = _ref12[0],
+            value = _ref12[1];
 
         result = replaceAll(result, "{".concat(key, "}"), value);
       });
@@ -15264,7 +11833,7 @@ var controls = {
 
     if (!is.empty(this.elements.buttons)) {
       var addProperty = function addProperty(button) {
-        var className = _this17.config.classNames.controlPressed;
+        var className = _this16.config.classNames.controlPressed;
         Object.defineProperty(button, 'pressed', {
           enumerable: true,
           get: function get() {
@@ -15300,12 +11869,91 @@ var controls = {
       var selector = "".concat(selectors.controls.wrapper, " ").concat(selectors.labels, " .").concat(classNames.hidden);
       var labels = getElements.call(this, selector);
       Array.from(labels).forEach(function (label) {
-        toggleClass(label, _this17.config.classNames.hidden, false);
-        toggleClass(label, _this17.config.classNames.tooltip, true);
+        toggleClass(label, _this16.config.classNames.hidden, false);
+        toggleClass(label, _this16.config.classNames.tooltip, true);
       });
     }
+  },
+  // Set media metadata
+  setMediaMetadata: function setMediaMetadata() {
+    try {
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new window.MediaMetadata({
+          title: this.config.mediaMetadata.title,
+          artist: this.config.mediaMetadata.artist,
+          album: this.config.mediaMetadata.album,
+          artwork: this.config.mediaMetadata.artwork
+        });
+      }
+    } catch (_) {// Do nothing
+    }
+  },
+  // Add markers
+  setMarkers: function setMarkers() {
+    var _this17 = this;
+
+    var _this$config$markers2, _this$config$markers3;
+
+    if (!this.duration || this.elements.markers) return; // Get valid points
+
+    var points = (_this$config$markers2 = this.config.markers) === null || _this$config$markers2 === void 0 ? void 0 : (_this$config$markers3 = _this$config$markers2.points) === null || _this$config$markers3 === void 0 ? void 0 : _this$config$markers3.filter(function (_ref13) {
+      var time = _ref13.time;
+      return time > 0 && time < _this17.duration;
+    });
+    if (!(points !== null && points !== void 0 && points.length)) return;
+    var containerFragment = document.createDocumentFragment();
+    var pointsFragment = document.createDocumentFragment();
+    var tipElement = null;
+    var tipVisible = "".concat(this.config.classNames.tooltip, "--visible");
+
+    var toggleTip = function toggleTip(show) {
+      return toggleClass(tipElement, tipVisible, show);
+    }; // Inject markers to progress container
+
+
+    points.forEach(function (point) {
+      var markerElement = createElement('span', {
+        class: _this17.config.classNames.marker
+      }, '');
+      var left = "".concat(point.time / _this17.duration * 100, "%");
+
+      if (tipElement) {
+        // Show on hover
+        markerElement.addEventListener('mouseenter', function () {
+          if (point.label) return;
+          tipElement.style.left = left;
+          tipElement.innerHTML = point.label;
+          toggleTip(true);
+        }); // Hide on leave
+
+        markerElement.addEventListener('mouseleave', function () {
+          toggleTip(false);
+        });
+      }
+
+      markerElement.addEventListener('click', function () {
+        _this17.currentTime = point.time;
+      });
+      markerElement.style.left = left;
+      pointsFragment.appendChild(markerElement);
+    });
+    containerFragment.appendChild(pointsFragment); // Inject a tooltip if needed
+
+    if (!this.config.tooltips.seek) {
+      tipElement = createElement('span', {
+        class: this.config.classNames.tooltip
+      }, '');
+      containerFragment.appendChild(tipElement);
+    }
+
+    this.elements.markers = {
+      points: pointsFragment,
+      tip: tipElement
+    };
+    this.elements.progress.appendChild(containerFragment);
   }
-};
+}; // ==========================================================================
+
 /**
  * Parse a string to a URL object
  * @param {String} input - the URL to be parsed
@@ -15324,7 +11972,7 @@ function parseUrl(input) {
 
   try {
     return new URL(url);
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 } // Convert object to URLSearchParams
@@ -15334,17 +11982,18 @@ function buildUrlParams(input) {
   var params = new URLSearchParams();
 
   if (is.object(input)) {
-    Object.entries(input).forEach(function (_ref12) {
-      var _ref13 = _slicedToArray(_ref12, 2),
-          key = _ref13[0],
-          value = _ref13[1];
+    Object.entries(input).forEach(function (_ref14) {
+      var _ref15 = _slicedToArray(_ref14, 2),
+          key = _ref15[0],
+          value = _ref15[1];
 
       params.set(key, value);
     });
   }
 
   return params;
-}
+} // ==========================================================================
+
 
 var captions = {
   // Setup captions
@@ -15475,7 +12124,10 @@ var captions = {
     } // Enable or disable captions based on track length
 
 
-    toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(tracks)); // Update available languages in list
+    if (this.elements) {
+      toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(tracks));
+    } // Update available languages in list
+
 
     if (is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
       controls.setCaptionsMenu.call(this);
@@ -15567,8 +12219,8 @@ var captions = {
       this.captions.currentTrack = index;
       var track = tracks[index];
 
-      var _ref14 = track || {},
-          language = _ref14.language; // Store reference to node for invalidation on remove
+      var _ref16 = track || {},
+          language = _ref16.language; // Store reference to node for invalidation on remove
 
 
       this.captions.currentTrackNode = track; // Update settings menu
@@ -15774,7 +12426,7 @@ var defaults = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.6.7/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.7.2/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -15994,6 +12646,7 @@ var defaults = {
     hover: 'plyr--hover',
     tooltip: 'plyr__tooltip',
     cues: 'plyr__cues',
+    marker: 'plyr__progress__marker',
     hidden: 'plyr__sr-only',
     hideControls: 'plyr--hide-controls',
     isIos: 'plyr--is-ios',
@@ -16040,7 +12693,8 @@ var defaults = {
   attributes: {
     embed: {
       provider: 'data-plyr-provider',
-      id: 'data-plyr-embed-id'
+      id: 'data-plyr-embed-id',
+      hash: 'data-plyr-embed-hash'
     }
   },
   // Advertisements plugin
@@ -16084,6 +12738,18 @@ var defaults = {
     customControls: true,
     noCookie: false // Whether to use an alternative version of YouTube without cookies
 
+  },
+  // Media Metadata
+  mediaMetadata: {
+    title: '',
+    artist: '',
+    album: '',
+    artwork: []
+  },
+  // Markers
+  markers: {
+    enabled: false,
+    points: []
   }
 }; // ==========================================================================
 // Plyr states
@@ -16238,7 +12904,7 @@ var Fullscreen = /*#__PURE__*/function () {
 
     _defineProperty$1(this, "trapFocus", function (event) {
       // Bail if iOS, not active, not the tab key
-      if (browser.isIos || !_this22.active || event.key !== 'Tab' || event.keyCode !== 9) {
+      if (browser.isIos || !_this22.active || event.key !== 'Tab') {
         return;
       } // Get the current focused element
 
@@ -16399,7 +13065,7 @@ var Fullscreen = /*#__PURE__*/function () {
         return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
       }
 
-      var element = !this.prefix ? document.fullscreenElement : document["".concat(this.prefix).concat(this.property, "Element")];
+      var element = !this.prefix ? this.target.getRootNode().fullscreenElement : this.target.getRootNode()["".concat(this.prefix).concat(this.property, "Element")];
       return element && element.shadowRoot ? element === this.target.getRootNode().host : element === this.target;
     } // Get target element
 
@@ -16466,7 +13132,8 @@ function loadImage(src) {
       src: src
     });
   });
-}
+} // ==========================================================================
+
 
 var ui = {
   addStyleHook: function addStyleHook() {
@@ -16527,7 +13194,9 @@ var ui = {
 
     controls.updateVolume.call(this); // Reset time display
 
-    controls.timeUpdate.call(this); // Update the UI
+    controls.timeUpdate.call(this); // Reset duration display
+
+    controls.durationUpdate.call(this); // Update the UI
 
     ui.checkPlaying.call(this); // Check for picture-in-picture support
 
@@ -16555,6 +13224,11 @@ var ui = {
 
     if (this.config.duration) {
       controls.durationUpdate.call(this);
+    } // Media metadata
+
+
+    if (this.config.mediaMetadata) {
+      controls.setMediaMetadata.call(this);
     }
   },
   // Setup aria attribute for play and iframe title
@@ -16611,14 +13285,14 @@ var ui = {
     return ready.call(this) // Load image
     .then(function () {
       return loadImage(poster);
-    }).catch(function (err) {
+    }).catch(function (error) {
       // Hide poster on error unless it's been set by another call
       if (poster === _this24.poster) {
         ui.togglePoster.call(_this24, false);
       } // Rethrow
 
 
-      throw err;
+      throw error;
     }).then(function () {
       // Prevent race conditions
       if (poster !== _this24.poster) {
@@ -16722,15 +13396,18 @@ var Listeners = /*#__PURE__*/function () {
     _defineProperty$1(this, "setTabFocus", function (event) {
       var player = _this28.player;
       var elements = player.elements;
+      var key = event.key,
+          type = event.type,
+          timeStamp = event.timeStamp;
       clearTimeout(_this28.focusTimer); // Ignore any key other than tab
 
-      if (event.type === 'keydown' && event.which !== 9) {
+      if (type === 'keydown' && key !== 'Tab') {
         return;
       } // Store reference to event timeStamp
 
 
-      if (event.type === 'keydown') {
-        _this28.lastKeyDown = event.timeStamp;
+      if (type === 'keydown') {
+        _this28.lastKeyDown = timeStamp;
       } // Remove current classes
 
 
@@ -16741,9 +13418,9 @@ var Listeners = /*#__PURE__*/function () {
       }; // Determine if a key was pressed to trigger this event
 
 
-      var wasKeyDown = event.timeStamp - _this28.lastKeyDown <= 20; // Ignore focus events if a key was pressed prior
+      var wasKeyDown = timeStamp - _this28.lastKeyDown <= 20; // Ignore focus events if a key was pressed prior
 
-      if (event.type === 'focus' && !wasKeyDown) {
+      if (type === 'focus' && !wasKeyDown) {
         return;
       } // Remove all current
 
@@ -16751,7 +13428,7 @@ var Listeners = /*#__PURE__*/function () {
       removeCurrent(); // Delay the adding of classname until the focus has changed
       // This event fires before the focusin event
 
-      if (event.type !== 'focusout') {
+      if (type !== 'focusout') {
         _this28.focusTimer = setTimeout(function () {
           var focused = document.activeElement; // Ignore if current focus element isn't inside the player
 
@@ -16817,47 +13494,58 @@ var Listeners = /*#__PURE__*/function () {
         }, delay);
       }); // Set a gutter for Vimeo
 
-      var setGutter = function setGutter(ratio, padding, toggle) {
+      var setGutter = function setGutter() {
         if (!player.isVimeo || player.config.vimeo.premium) {
           return;
         }
 
-        var target = player.elements.wrapper.firstChild;
-
-        var _ratio3 = _slicedToArray(ratio, 2),
-            y = _ratio3[1];
+        var target = elements.wrapper;
+        var active = player.fullscreen.active;
 
         var _getAspectRatio$call = getAspectRatio.call(player),
             _getAspectRatio$call2 = _slicedToArray(_getAspectRatio$call, 2),
-            videoX = _getAspectRatio$call2[0],
-            videoY = _getAspectRatio$call2[1];
+            videoWidth = _getAspectRatio$call2[0],
+            videoHeight = _getAspectRatio$call2[1];
 
-        target.style.maxWidth = toggle ? "".concat(y / videoY * videoX, "px") : null;
-        target.style.margin = toggle ? '0 auto' : null;
-      }; // Resize on fullscreen change
+        var useNativeAspectRatio = supportsCSS("aspect-ratio: ".concat(videoWidth, " / ").concat(videoHeight)); // If not active, remove styles
+
+        if (!active) {
+          if (useNativeAspectRatio) {
+            target.style.width = null;
+            target.style.height = null;
+          } else {
+            target.style.maxWidth = null;
+            target.style.margin = null;
+          }
+
+          return;
+        } // Determine which dimension will overflow and constrain view
 
 
-      var setPlayerSize = function setPlayerSize(measure) {
-        // If we don't need to measure the viewport
-        if (!measure) {
-          return setAspectRatio.call(player);
+        var _getViewportSize = getViewportSize(),
+            _getViewportSize2 = _slicedToArray(_getViewportSize, 2),
+            viewportWidth = _getViewportSize2[0],
+            viewportHeight = _getViewportSize2[1];
+
+        var overflow = viewportWidth / viewportHeight > videoWidth / videoHeight;
+
+        if (useNativeAspectRatio) {
+          target.style.width = overflow ? 'auto' : '100%';
+          target.style.height = overflow ? '100%' : 'auto';
+        } else {
+          target.style.maxWidth = overflow ? "".concat(viewportHeight / videoHeight * videoWidth, "px") : null;
+          target.style.margin = overflow ? '0 auto' : null;
         }
+      }; // Handle resizing
 
-        var rect = elements.container.getBoundingClientRect();
-        var width = rect.width,
-            height = rect.height;
-        return setAspectRatio.call(player, "".concat(width, ":").concat(height));
-      };
 
       var resized = function resized() {
         clearTimeout(timers.resized);
-        timers.resized = setTimeout(setPlayerSize, 50);
+        timers.resized = setTimeout(setGutter, 50);
       };
 
       on.call(player, elements.container, 'enterfullscreen exitfullscreen', function (event) {
-        var _player$fullscreen = player.fullscreen,
-            target = _player$fullscreen.target,
-            usingNative = _player$fullscreen.usingNative; // Ignore events not from target
+        var target = player.fullscreen.target; // Ignore events not from target
 
         if (target !== elements.container) {
           return;
@@ -16866,31 +13554,13 @@ var Listeners = /*#__PURE__*/function () {
 
         if (!player.isEmbed && is.empty(player.config.ratio)) {
           return;
-        }
-
-        var isEnter = event.type === 'enterfullscreen'; // Set the player size when entering fullscreen to viewport size
-
-        var _setPlayerSize = setPlayerSize(isEnter),
-            padding = _setPlayerSize.padding,
-            ratio = _setPlayerSize.ratio; // Set Vimeo gutter
+        } // Set Vimeo gutter
 
 
-        setGutter(ratio, padding, isEnter); // Horrible hack for Safari 14 not repainting properly on entering fullscreen
+        setGutter(); // Watch for resizes
 
-        if (isEnter) {
-          setTimeout(function () {
-            return repaint(elements.container);
-          }, 100);
-        } // If not using native browser fullscreen API, we need to check for resizes of viewport
-
-
-        if (!usingNative) {
-          if (isEnter) {
-            on.call(player, window, 'resize', resized);
-          } else {
-            off.call(player, window, 'resize', resized);
-          }
-        }
+        var method = event.type === 'enterfullscreen' ? on : off;
+        method.call(player, window, 'resize', resized);
       });
     });
 
@@ -17113,14 +13783,12 @@ var Listeners = /*#__PURE__*/function () {
 
 
       _this28.bind(elements.buttons.settings, 'keyup', function (event) {
-        var code = event.which; // We only care about space and return
-
-        if (![13, 32].includes(code)) {
+        if (!['Space', 'Enter'].includes(event.key)) {
           return;
         } // Because return triggers a click anyway, all we need to do is set focus
 
 
-        if (code === 13) {
+        if (event.key === 'Enter') {
           controls.focusFirstMenuItem.call(player, null, true);
           return;
         } // Prevent scroll
@@ -17136,7 +13804,7 @@ var Listeners = /*#__PURE__*/function () {
 
 
       _this28.bind(elements.settings.menu, 'keydown', function (event) {
-        if (event.which === 27) {
+        if (event.key === 'Escape') {
           controls.toggleMenu.call(player, event);
         }
       }); // Set range input alternative "value", which matches the tooltip time (#954)
@@ -17151,10 +13819,9 @@ var Listeners = /*#__PURE__*/function () {
 
       _this28.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
         var seek = event.currentTarget;
-        var code = event.keyCode ? event.keyCode : event.which;
         var attribute = 'play-on-seeked';
 
-        if (is.keyboardEvent(event) && code !== 39 && code !== 37) {
+        if (is.keyboardEvent(event) && !['ArrowLeft', 'ArrowRight'].includes(event.key)) {
           return;
         } // Record seek time so we can prevent hiding controls for a few seconds after seek
 
@@ -17280,7 +13947,9 @@ var Listeners = /*#__PURE__*/function () {
           return !c.contains(elements.container);
         }).forEach(function (child) {
           _this28.bind(child, 'mouseenter mouseleave', function (event) {
-            elements.controls.hover = !player.touch && event.type === 'mouseenter';
+            if (elements.controls) {
+              elements.controls.hover = !player.touch && event.type === 'mouseenter';
+            }
           });
         });
       } // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
@@ -17314,7 +13983,7 @@ var Listeners = /*#__PURE__*/function () {
 
 
       _this28.bind(elements.inputs.volume, 'wheel', function (event) {
-        // Detect "natural" scroll - suppored on OS X Safari only
+        // Detect "natural" scroll - supported on OS X Safari only
         // Other browsers on OS X will be inverted until support improves
         var inverted = event.webkitDirectionInvertedFromDevice; // Get delta from event. Invert if `inverted` is true
 
@@ -17354,24 +14023,29 @@ var Listeners = /*#__PURE__*/function () {
     value: function handleKey(event) {
       var player = this.player;
       var elements = player.elements;
-      var code = event.keyCode ? event.keyCode : event.which;
-      var pressed = event.type === 'keydown';
-      var repeat = pressed && code === this.lastKey; // Bail if a modifier key is set
+      var key = event.key,
+          type = event.type,
+          altKey = event.altKey,
+          ctrlKey = event.ctrlKey,
+          metaKey = event.metaKey,
+          shiftKey = event.shiftKey;
+      var pressed = type === 'keydown';
+      var repeat = pressed && key === this.lastKey; // Bail if a modifier key is set
 
-      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+      if (altKey || ctrlKey || metaKey || shiftKey) {
         return;
       } // If the event is bubbled from the media element
-      // Firefox doesn't get the keycode for whatever reason
+      // Firefox doesn't get the key for whatever reason
 
 
-      if (!is.number(code)) {
+      if (!key) {
         return;
-      } // Seek by the number keys
+      } // Seek by increment
 
 
-      var seekByKey = function seekByKey() {
+      var seekByIncrement = function seekByIncrement(increment) {
         // Divide the max duration into 10th's and times by the number value
-        player.currentTime = player.duration / 10 * (code - 48);
+        player.currentTime = player.duration / 10 * increment;
       }; // Handle the key on keydown
       // Reset on keyup
 
@@ -17390,101 +14064,91 @@ var Listeners = /*#__PURE__*/function () {
             return;
           }
 
-          if (event.which === 32 && matches(focused, 'button, [role^="menuitem"]')) {
+          if (event.key === 'Space' && matches(focused, 'button, [role^="menuitem"]')) {
             return;
           }
-        } // Which keycodes should we prevent default
+        } // Which keys should we prevent default
 
 
-        var preventDefault = [32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79]; // If the code is found prevent default (e.g. prevent scrolling for arrows)
+        var preventDefault = ['Space', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'c', 'f', 'k', 'l', 'm']; // If the key is found prevent default (e.g. prevent scrolling for arrows)
 
-        if (preventDefault.includes(code)) {
+        if (preventDefault.includes(key)) {
           event.preventDefault();
           event.stopPropagation();
         }
 
-        switch (code) {
-          case 48:
-          case 49:
-          case 50:
-          case 51:
-          case 52:
-          case 53:
-          case 54:
-          case 55:
-          case 56:
-          case 57:
-            // 0-9
+        switch (key) {
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
             if (!repeat) {
-              seekByKey();
+              seekByIncrement(parseInt(key, 10));
             }
 
             break;
 
-          case 32:
-          case 75:
-            // Space and K key
+          case 'Space':
+          case 'k':
             if (!repeat) {
               silencePromise(player.togglePlay());
             }
 
             break;
 
-          case 38:
-            // Arrow up
+          case 'ArrowUp':
             player.increaseVolume(0.1);
             break;
 
-          case 40:
-            // Arrow down
+          case 'ArrowDown':
             player.decreaseVolume(0.1);
             break;
 
-          case 77:
-            // M key
+          case 'm':
             if (!repeat) {
               player.muted = !player.muted;
             }
 
             break;
 
-          case 39:
-            // Arrow forward
+          case 'ArrowRight':
             player.forward();
             break;
 
-          case 37:
-            // Arrow back
+          case 'ArrowLeft':
             player.rewind();
             break;
 
-          case 70:
-            // F key
+          case 'f':
             player.fullscreen.toggle();
             break;
 
-          case 67:
-            // C key
+          case 'c':
             if (!repeat) {
               player.toggleCaptions();
             }
 
             break;
 
-          case 76:
-            // L key
+          case 'l':
             player.loop = !player.loop;
             break;
         } // Escape is handle natively when in full screen
         // So we only need to worry about non native
 
 
-        if (code === 27 && !player.fullscreen.usingNative && player.fullscreen.active) {
+        if (key === 'Escape' && !player.fullscreen.usingNative && player.fullscreen.active) {
           player.fullscreen.toggle();
-        } // Store last code for next cycle
+        } // Store last key for next cycle
 
 
-        this.lastKey = code;
+        this.lastKey = key;
       } else {
         this.lastKey = null;
       }
@@ -17816,6 +14480,20 @@ function parseId$1(url) {
 
   var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
   return url.match(regex) ? RegExp.$2 : url;
+} // Try to extract a hash for private videos from the URL
+
+
+function parseHash(url) {
+  /* This regex matches a hexadecimal hash if given in any of these forms:
+   *  - [https://player.]vimeo.com/video/{id}/{hash}[?params]
+   *  - [https://player.]vimeo.com/video/{id}?h={hash}[&params]
+   *  - [https://player.]vimeo.com/video/{id}?[params]&h={hash}
+   *  - video/{id}/{hash}
+   * If matched, the hash is available in capture group 4
+   */
+  var regex = /^.*(vimeo.com\/|video\/)(\d+)(\?.*&*h=|\/)+([\d,a-f]+)/;
+  var found = url.match(regex);
+  return found && found.length === 5 ? found[4] : null;
 } // Set playback state and trigger change (only on actual change)
 
 
@@ -17859,8 +14537,23 @@ var vimeo = {
 
     var premium = config.premium,
         referrerPolicy = config.referrerPolicy,
-        frameParams = _objectWithoutProperties(config, ["premium", "referrerPolicy"]); // If the owner has a pro or premium account then we can hide controls etc
+        frameParams = _objectWithoutProperties(config, ["premium", "referrerPolicy"]); // Get the source URL or ID
 
+
+    var source = player.media.getAttribute('src');
+    var hash = ''; // Get from <div> if needed
+
+    if (is.empty(source)) {
+      source = player.media.getAttribute(player.config.attributes.embed.id); // hash can also be set as attribute on the <div>
+
+      hash = player.media.getAttribute(player.config.attributes.embed.hash);
+    } else {
+      hash = parseHash(source);
+    }
+
+    var hashParam = hash ? {
+      h: hash
+    } : {}; // If the owner has a pro or premium account then we can hide controls etc
 
     if (premium) {
       Object.assign(frameParams, {
@@ -17870,20 +14563,13 @@ var vimeo = {
     } // Get Vimeo params for the iframe
 
 
-    var params = buildUrlParams(_objectSpread2({
+    var params = buildUrlParams(_objectSpread2(_objectSpread2({
       loop: player.config.loop.active,
       autoplay: player.autoplay,
       muted: player.muted,
       gesture: 'media',
       playsinline: !this.config.fullscreen.iosNative
-    }, frameParams)); // Get the source URL or ID
-
-    var source = player.media.getAttribute('src'); // Get from <div> if needed
-
-    if (is.empty(source)) {
-      source = player.media.getAttribute(player.config.attributes.embed.id);
-    }
-
+    }, hashParam), frameParams));
     var id = parseId$1(source); // Build an iframe
 
     var iframe = createElement('iframe');
@@ -18089,9 +14775,9 @@ var vimeo = {
       player.media.textTracks = tracks;
       captions.setup.call(player);
     });
-    player.embed.on('cuechange', function (_ref15) {
-      var _ref15$cues = _ref15.cues,
-          cues = _ref15$cues === void 0 ? [] : _ref15$cues;
+    player.embed.on('cuechange', function (_ref17) {
+      var _ref17$cues = _ref17.cues,
+          cues = _ref17$cues === void 0 ? [] : _ref17$cues;
       var strippedCues = cues.map(function (cue) {
         return stripHTML(cue.text);
       });
@@ -18574,7 +15260,8 @@ var youtube = {
       }
     });
   }
-};
+}; // ==========================================================================
+
 var media = {
   // Setup media
   setup: function setup() {
@@ -18734,8 +15421,8 @@ var Ads = /*#__PURE__*/function () {
         request.setAdWillPlayMuted(!_this32.player.muted);
 
         _this32.loader.requestAds(request);
-      } catch (e) {
-        _this32.onAdError(e);
+      } catch (error) {
+        _this32.onAdError(error);
       }
     });
 
@@ -19161,6 +15848,26 @@ var Ads = /*#__PURE__*/function () {
 
   return Ads;
 }();
+/**
+ * Returns a number whose value is limited to the given range.
+ *
+ * Example: limit the output of this computation to between 0 and 255
+ * (x * 255).clamp(0, 255)
+ *
+ * @param {Number} input
+ * @param {Number} min The lower boundary of the output range
+ * @param {Number} max The upper boundary of the output range
+ * @returns A number within the bounds of min and max
+ * @type Number
+ */
+
+
+function clamp() {
+  var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var min = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var max = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 255;
+  return Math.min(Math.max(input, min), max);
+}
 
 var parseVtt = function parseVtt(vttDataString) {
   var processedList = [];
@@ -19249,9 +15956,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
         _this33.player.elements.display.seekTooltip.hidden = _this33.enabled;
       }
 
-      if (!_this33.enabled) {
-        return;
-      }
+      if (!_this33.enabled) return;
 
       _this33.getThumbnails().then(function () {
         if (!_this33.enabled) {
@@ -19341,24 +16046,18 @@ var PreviewThumbnails = /*#__PURE__*/function () {
     });
 
     _defineProperty$1(this, "startMove", function (event) {
-      if (!_this33.loaded) {
-        return;
-      }
+      if (!_this33.loaded) return;
+      if (!is.event(event) || !['touchmove', 'mousemove'].includes(event.type)) return; // Wait until media has a duration
 
-      if (!is.event(event) || !['touchmove', 'mousemove'].includes(event.type)) {
-        return;
-      } // Wait until media has a duration
-
-
-      if (!_this33.player.media.duration) {
-        return;
-      }
+      if (!_this33.player.media.duration) return;
 
       if (event.type === 'touchmove') {
         // Calculate seek hover position as approx video seconds
         _this33.seekTime = _this33.player.media.duration * (_this33.player.elements.inputs.seek.value / 100);
       } else {
-        // Calculate seek hover position as approx video seconds
+        var _this$player$config$m, _this$player$config$m2; // Calculate seek hover position as approx video seconds
+
+
         var clientRect = _this33.player.elements.progress.getBoundingClientRect();
 
         var percentage = 100 / clientRect.width * (event.pageX - clientRect.left);
@@ -19376,7 +16075,17 @@ var PreviewThumbnails = /*#__PURE__*/function () {
 
         _this33.mousePosX = event.pageX; // Set time text inside image container
 
-        _this33.elements.thumb.time.innerText = _formatTime(_this33.seekTime);
+        _this33.elements.thumb.time.innerText = _formatTime(_this33.seekTime); // Get marker point for time
+
+        var point = (_this$player$config$m = _this33.player.config.markers) === null || _this$player$config$m === void 0 ? void 0 : (_this$player$config$m2 = _this$player$config$m.points) === null || _this$player$config$m2 === void 0 ? void 0 : _this$player$config$m2.find(function (_ref18) {
+          var t = _ref18.time;
+          return t === Math.round(_this33.seekTime);
+        }); // Append the point label to the tooltip
+
+        if (point) {
+          // this.elements.thumb.time.innerText.concat('\n');
+          _this33.elements.thumb.time.insertAdjacentHTML('afterbegin', "".concat(point.label, "<br>"));
+        }
       } // Download and show image
 
 
@@ -19454,7 +16163,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
       _this33.elements.thumb.time = createElement('span', {}, '00:00');
       timeContainer.appendChild(_this33.elements.thumb.time);
 
-      _this33.elements.thumb.container.appendChild(timeContainer); // Inject the whole thumb
+      _this33.elements.thumb.imageContainer.appendChild(timeContainer); // Inject the whole thumb
 
 
       if (is.element(_this33.player.elements.progress)) {
@@ -19509,7 +16218,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
         if (_this33.loadedImages.includes(thumbnail.frames[thumbNum].text)) {
           qualityIndex = index;
         }
-      }); // Only proceed if either thumbnum or thumbfilename has changed
+      }); // Only proceed if either thumb num or thumbfilename has changed
 
 
       if (thumbNum !== _this33.showingThumb) {
@@ -19719,43 +16428,40 @@ var PreviewThumbnails = /*#__PURE__*/function () {
     });
 
     _defineProperty$1(this, "setThumbContainerSizeAndPos", function () {
+      var imageContainer = _this33.elements.thumb.imageContainer;
+
       if (!_this33.sizeSpecifiedInCSS) {
         var thumbWidth = Math.floor(_this33.thumbContainerHeight * _this33.thumbAspectRatio);
-        _this33.elements.thumb.imageContainer.style.height = "".concat(_this33.thumbContainerHeight, "px");
-        _this33.elements.thumb.imageContainer.style.width = "".concat(thumbWidth, "px");
-      } else if (_this33.elements.thumb.imageContainer.clientHeight > 20 && _this33.elements.thumb.imageContainer.clientWidth < 20) {
-        var _thumbWidth = Math.floor(_this33.elements.thumb.imageContainer.clientHeight * _this33.thumbAspectRatio);
+        imageContainer.style.height = "".concat(_this33.thumbContainerHeight, "px");
+        imageContainer.style.width = "".concat(thumbWidth, "px");
+      } else if (imageContainer.clientHeight > 20 && imageContainer.clientWidth < 20) {
+        var _thumbWidth = Math.floor(imageContainer.clientHeight * _this33.thumbAspectRatio);
 
-        _this33.elements.thumb.imageContainer.style.width = "".concat(_thumbWidth, "px");
-      } else if (_this33.elements.thumb.imageContainer.clientHeight < 20 && _this33.elements.thumb.imageContainer.clientWidth > 20) {
-        var thumbHeight = Math.floor(_this33.elements.thumb.imageContainer.clientWidth / _this33.thumbAspectRatio);
-        _this33.elements.thumb.imageContainer.style.height = "".concat(thumbHeight, "px");
+        imageContainer.style.width = "".concat(_thumbWidth, "px");
+      } else if (imageContainer.clientHeight < 20 && imageContainer.clientWidth > 20) {
+        var thumbHeight = Math.floor(imageContainer.clientWidth / _this33.thumbAspectRatio);
+        imageContainer.style.height = "".concat(thumbHeight, "px");
       }
 
       _this33.setThumbContainerPos();
     });
 
     _defineProperty$1(this, "setThumbContainerPos", function () {
-      var seekbarRect = _this33.player.elements.progress.getBoundingClientRect();
+      var scrubberRect = _this33.player.elements.progress.getBoundingClientRect();
 
-      var plyrRect = _this33.player.elements.container.getBoundingClientRect();
+      var containerRect = _this33.player.elements.container.getBoundingClientRect();
 
       var container = _this33.elements.thumb.container; // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
 
-      var minVal = plyrRect.left - seekbarRect.left + 10;
-      var maxVal = plyrRect.right - seekbarRect.left - container.clientWidth - 10; // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
+      var min = containerRect.left - scrubberRect.left + 10;
+      var max = containerRect.right - scrubberRect.left - container.clientWidth - 10; // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
 
-      var previewPos = _this33.mousePosX - seekbarRect.left - container.clientWidth / 2;
+      var position = _this33.mousePosX - scrubberRect.left - container.clientWidth / 2;
+      var clamped = clamp(position, min, max); // Move the popover position
 
-      if (previewPos < minVal) {
-        previewPos = minVal;
-      }
+      container.style.left = "".concat(clamped, "px"); // The arrow can follow the cursor
 
-      if (previewPos > maxVal) {
-        previewPos = maxVal;
-      }
-
-      container.style.left = "".concat(previewPos, "px");
+      container.style.setProperty('--preview-arrow-offset', "".concat(position - clamped, "px"));
     });
 
     _defineProperty$1(this, "setScrubbingContainerSize", function () {
@@ -19771,10 +16477,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
     });
 
     _defineProperty$1(this, "setImageSizeAndOffset", function (previewImage, frame) {
-      if (!_this33.usingSprites) {
-        return;
-      } // Find difference between height and preview container height
-
+      if (!_this33.usingSprites) return; // Find difference between height and preview container height
 
       var multiplier = _this33.thumbContainerHeight / frame.h; // eslint-disable-next-line no-param-reassign
 
@@ -19808,11 +16511,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
   }, {
     key: "currentImageContainer",
     get: function get() {
-      if (this.mouseDown) {
-        return this.elements.scrubbing.container;
-      }
-
-      return this.elements.thumb.imageContainer;
+      return this.mouseDown ? this.elements.scrubbing.container : this.elements.thumb.imageContainer;
     }
   }, {
     key: "usingSprites",
@@ -19851,11 +16550,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
   }, {
     key: "currentImageElement",
     get: function get() {
-      if (this.mouseDown) {
-        return this.currentScrubbingImageElement;
-      }
-
-      return this.currentThumbnailImageElement;
+      return this.mouseDown ? this.currentScrubbingImageElement : this.currentThumbnailImageElement;
     },
     set: function set(element) {
       if (this.mouseDown) {
@@ -20016,29 +16711,9 @@ var source = {
       _this35.fullscreen.update();
     }, true);
   }
-};
-/**
- * Returns a number whose value is limited to the given range.
- *
- * Example: limit the output of this computation to between 0 and 255
- * (x * 255).clamp(0, 255)
- *
- * @param {Number} input
- * @param {Number} min The lower boundary of the output range
- * @param {Number} max The upper boundary of the output range
- * @returns A number in the range [min, max]
- * @type Number
- */
-
-function clamp() {
-  var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-  var min = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  var max = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 255;
-  return Math.min(Math.max(input, min), max);
-} // TODO: Use a WeakMap for private globals
+}; // TODO: Use a WeakMap for private globals
 // const globals = new WeakMap();
 // Plyr instance
-
 
 var Plyr = /*#__PURE__*/function () {
   function Plyr(target, options) {
@@ -20278,7 +16953,7 @@ var Plyr = /*#__PURE__*/function () {
     this.config = extend({}, defaults, Plyr.defaults, options || {}, function () {
       try {
         return JSON.parse(_this36.media.getAttribute('data-plyr-config'));
-      } catch (e) {
+      } catch (_) {
         return {};
       }
     }()); // Elements cache
@@ -20527,7 +17202,37 @@ var Plyr = /*#__PURE__*/function () {
     }
     /**
      * Set the caption track by index
-     * @param {Number} - Caption index
+     * @param {Number} input - Caption index
+     */
+
+  }, {
+    key: "setPreviewThumbnails",
+
+    /**
+     * Sets the preview thubmnails for the current source
+     */
+    value: function setPreviewThumbnails(thumbnailSource) {
+      if (this.previewThumbnails && this.previewThumbnails.loaded) {
+        this.previewThumbnails.destroy();
+        this.previewThumbnails = null;
+      }
+
+      Object.assign(this.config.previewThumbnails, thumbnailSource); // Create new instance if it is still enabled
+
+      if (this.config.previewThumbnails.enabled) {
+        this.previewThumbnails = new PreviewThumbnails(this);
+      }
+    }
+    /**
+     * Trigger the airplay dialog
+     * TODO: update player with state, support, enabled
+     */
+
+    /**
+     * Check for support
+     * @param {String} type - Player type (audio/video)
+     * @param {String} provider - Provider (html5/youtube/vimeo)
+     * @param {Boolean} inline - Where player has `playsinline` sttribute
      */
 
   }, {
@@ -20787,7 +17492,7 @@ var Plyr = /*#__PURE__*/function () {
     }
     /**
      * Set playback speed
-     * @param {Number} speed - the speed of playback (0.5-2.0)
+     * @param {Number} input - the speed of playback (0.5-2.0)
      */
 
   }, {
@@ -20817,7 +17522,9 @@ var Plyr = /*#__PURE__*/function () {
       this.config.speed.selected = speed; // Set media speed
 
       setTimeout(function () {
-        _this37.media.playbackRate = speed;
+        if (_this37.media) {
+          _this37.media.playbackRate = speed;
+        }
       }, 0);
     }
     /**
@@ -21074,8 +17781,7 @@ var Plyr = /*#__PURE__*/function () {
   }, {
     key: "autoplay",
     set: function set(input) {
-      var toggle = is.boolean(input) ? input : this.config.autoplay;
-      this.config.autoplay = toggle;
+      this.config.autoplay = is.boolean(input) ? input : this.config.autoplay;
     }
     /**
      * Get the current autoplay state
@@ -21088,6 +17794,7 @@ var Plyr = /*#__PURE__*/function () {
     key: "currentTrack",
     set: function set(input) {
       captions.set.call(this, input, false);
+      captions.setup.call(this);
     }
     /**
      * Get the current caption track index (-1 if disabled)
@@ -21102,7 +17809,7 @@ var Plyr = /*#__PURE__*/function () {
     /**
      * Set the wanted language for captions
      * Since tracks can be added later it won't update the actual caption track until there is a matching track
-     * @param {String} - Two character ISO language code (e.g. EN, FR, PT, etc)
+     * @param {String} input - Two character ISO language code (e.g. EN, FR, PT, etc)
      */
 
   }, {
@@ -21165,18 +17872,6 @@ var Plyr = /*#__PURE__*/function () {
 
       return this.media === document.pictureInPictureElement;
     }
-    /**
-     * Trigger the airplay dialog
-     * TODO: update player with state, support, enabled
-     */
-
-    /**
-     * Check for support
-     * @param {String} type - Player type (audio/video)
-     * @param {String} provider - Provider (html5/youtube/vimeo)
-     * @param {Boolean} inline - Where player has `playsinline` sttribute
-     */
-
   }], [{
     key: "supported",
     value: function supported(type, provider, inline) {
